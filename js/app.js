@@ -5720,10 +5720,29 @@
     bar.style.width = '0%'; pct.textContent = '0%'; info.textContent = 'Menyiapkan…';
     btn.textContent = 'Batal'; btn.disabled = false;
     $('#emShare').classList.add('hidden');
+    const stall = $('#emStall'), retry = $('#emRetryRt');
+    stall.classList.add('hidden'); retry.classList.add('hidden');
     const t0 = performance.now();
+    let lastTick = t0, lastMsg = 'Menyiapkan…', finished = false, stopRes;
+    // pengawas: bila tidak ada kemajuan lama, beri tahu tahapnya & tawarkan jalan keluar
+    const watch = setInterval(() => {
+      if (finished) return clearInterval(watch);
+      const idle = (performance.now() - lastTick) / 1000;
+      if (idle < 20) { stall.classList.add('hidden'); retry.classList.add('hidden'); return; }
+      stall.textContent = `⚠ Tidak ada kemajuan selama ${Math.round(idle)} detik (tahap: ${lastMsg.split(' • ')[0]}). ` +
+        (document.hidden ? 'Aplikasi sempat ditinggalkan / layar mati — biarkan tetap terbuka. ' : '') +
+        'Di HP/tablet coba resolusi 720p atau 1080p, atau mesin Realtime.';
+      stall.classList.remove('hidden');
+      if (!ctl.noRetry) retry.classList.remove('hidden');
+    }, 2000);
     const ctl = {
       onCancel: null,
+      cancelled: false,
+      retryRealtime: false,
+      // selesai paksa bila proses tidak berhenti sendiri setelah Batal
+      stopped: new Promise((r) => { stopRes = r; }),
       progress(p, msg = '') {
+        lastTick = performance.now(); if (msg) lastMsg = msg;
         bar.style.width = `${clamp(p) * 100}%`;
         pct.textContent = `${Math.floor(clamp(p) * 100)}%`;
         const el = (performance.now() - t0) / 1000;
@@ -5731,6 +5750,7 @@
         info.textContent = msg + (isFinite(eta) && p < 1 ? ` • sisa ±${fmtTime(Math.ceil(eta))}` : '');
       },
       done(msg) {
+        finished = true; stall.classList.add('hidden'); retry.classList.add('hidden');
         $('#emTitle').textContent = 'Selesai ✓';
         bar.style.width = '100%'; pct.textContent = '100%';
         const el = (performance.now() - t0) / 1000;
@@ -5738,9 +5758,16 @@
         btn.textContent = 'Tutup';
         btn.onclick = ctl.close;
       },
-      close() { modal.classList.add('hidden'); },
+      close() { finished = true; clearInterval(watch); modal.classList.add('hidden'); },
     };
-    btn.onclick = () => { btn.disabled = true; btn.textContent = 'Membatalkan…'; if (ctl.onCancel) ctl.onCancel(); };
+    const cancel = () => {
+      if (ctl.cancelled) return;
+      ctl.cancelled = true; btn.disabled = true; btn.textContent = 'Membatalkan…';
+      if (ctl.onCancel) ctl.onCancel();
+      setTimeout(() => stopRes(null), 2500);
+    };
+    btn.onclick = cancel;
+    retry.onclick = () => { ctl.retryRealtime = true; cancel(); };
     return ctl;
   }
 
@@ -5754,18 +5781,37 @@
     const useWC = state.export.mode !== 'realtime' && webCodecsAvailable();
     if (!useWC && !pickMime()) { toast('Browser ini tidak mendukung export video.', 'error'); return; }
     const ctl = openExportModal(useWC ? 'WebCodecs • MP4 H.264 • presisi frame' : 'Realtime • MediaRecorder');
+    if (!useWC) ctl.noRetry = true;
     player.exporting = true; // ukuran canvas mengikuti resolusi export
     document.body.classList.add('exporting');
+    holdWake();
     render(0);
 
     let result = null, error = null;
     try {
-      result = useWC ? await exportWebCodecs(ctl) : await exportRealtime(ctl);
+      result = await Promise.race([useWC ? exportWebCodecs(ctl) : exportRealtime(ctl), ctl.stopped]);
     } catch (e) {
       error = e;
       console.error(e);
     }
     endExport();
+    if (ctl.retryRealtime) {
+      ctl.close();
+      state.export.mode = 'realtime';
+      const sel = $('#exportMode'); if (sel) sel.value = 'realtime';
+      showFormatInfo(); save();
+      toast('Mengulang export dengan mesin Realtime — biarkan layar menyala sampai selesai.', 'info', 6000);
+      setTimeout(exportVideo, 300);
+      return;
+    }
+    if (useWC && error) {
+      ctl.close();
+      toast(`Export Presisi gagal di perangkat ini (${error.message || error}). Ketuk Export lagi — mesin otomatis diganti ke Realtime.`, 'error', 10000);
+      state.export.mode = 'realtime';
+      const sel = $('#exportMode'); if (sel) sel.value = 'realtime';
+      showFormatInfo(); save();
+      return;
+    }
 
     if (error) {
       ctl.close();
@@ -5794,7 +5840,7 @@
     const br = exportBitrate(w, h), mb = ((br + 192000) * dur) / 8 / 1048576;
     const mm = Math.floor(dur / 60), ss = Math.round(dur % 60);
     $('#expDims').textContent = `${w} × ${h}`;
-    $('#expEstimate').innerHTML = `<b>${w} × ${h}</b> • ${fps} fps • ${mm}:${String(ss).padStart(2, '0')} • ± <b>${mb < 1 ? (mb * 1024).toFixed(0) + ' KB' : mb.toFixed(mb < 10 ? 1 : 0) + ' MB'}</b> (${(br / 1e6).toFixed(1)} Mbps)${w * h > 3840 * 2160 * 0.9 ? '<br><span class="muted">4K butuh komputer kuat; export lebih lama.</span>' : ''}`;
+    $('#expEstimate').innerHTML = `<b>${w} × ${h}</b> • ${fps} fps • ${mm}:${String(ss).padStart(2, '0')} • ± <b>${mb < 1 ? (mb * 1024).toFixed(0) + ' KB' : mb.toFixed(mb < 10 ? 1 : 0) + ' MB'}</b> (${(br / 1e6).toFixed(1)} Mbps)${w * h > 3840 * 2160 * 0.9 ? '<br><span class="muted">4K butuh komputer kuat; export lebih lama.</span>' : ''}${isMobile() && w * h > 1920 * 1080 * 1.1 ? '<br><span class="muted">⚠ Di HP/tablet resolusi di atas 1080p sering macet; pilih 1080p atau 720p.</span>' : ''}`;
     const ni = $('#expName');
     if (document.activeElement !== ni) { ni.value = state.export.fileName || ''; ni.placeholder = slug(state.name) + '-' + 'tanggal'; }
   }
@@ -5846,7 +5892,14 @@
     });
   }
 
+  let exportWake = null;
+  async function holdWake() {
+    try { if (navigator.wakeLock && !document.hidden) exportWake = await navigator.wakeLock.request('screen'); } catch (_) { exportWake = null; }
+  }
+  document.addEventListener('visibilitychange', () => { if (player.exporting && !document.hidden && (!exportWake || exportWake.released)) holdWake(); });
   function endExport() {
+    try { if (exportWake) exportWake.release(); } catch (_) { /* abaikan */ }
+    exportWake = null;
     player.exporting = false;
     offlineAudio = null;
     document.body.classList.remove('exporting');
@@ -5868,8 +5921,10 @@
     const word = freeMode() ? 'teks' : 'scene';
     if (!n) { toast('Belum ada teks.', 'error'); return; }
     const ctl = openExportModal(`Per ${word} • ${n} video MP4 terpisah`);
+    ctl.noRetry = true;
     player.exporting = true;
     document.body.classList.add('exporting');
+    holdWake();
     render(0);
 
     let error = null, cancelled = false, saved = 0, size = 0;
@@ -5880,7 +5935,7 @@
         progress: (p, m) => ctl.progress((i + p) / n, `${word[0].toUpperCase() + word.slice(1)} ${i + 1}/${n} • ${m}`),
       };
       let res = null;
-      try { res = await exportWebCodecs(sub, { from: part.a, to: part.b }); } catch (e) { error = e; console.error(e); break; }
+      try { res = await Promise.race([exportWebCodecs(sub, { from: part.a, to: part.b }), ctl.stopped]); } catch (e) { error = e; console.error(e); break; }
       offlineAudio = null;
       if (!res || cancelled) { cancelled = true; break; }
       downloadBlob(res.blob, `${slug(state.name)}-${word}-${String(i + 1).padStart(2, '0')}.mp4`);
@@ -5964,11 +6019,12 @@
 
   // Render musik + voice-over (volume, titik mulai, loop, ducking, fade out) secara offline.
   // `from` = detik awal potongan (untuk export per scene).
-  async function renderAudioOffline(total, from = 0) {
+  async function renderAudioOffline(total, from = 0, note = null) {
     const sr = 48000;
     const oc = new OfflineAudioContext(2, Math.ceil(total * sr), sr);
     if (usesPitch()) await loadPitch(oc);
-    const decode = async (url) => oc.decodeAudioData(await (await fetch(url)).arrayBuffer());
+    let nDec = 0;
+    const decode = async (url) => { if (note) note(`Membaca suara file ${++nDec}…`); return oc.decodeAudioData(await (await fetch(url)).arrayBuffer()); };
     const voiceBuf = voice.src ? await decode(voice.src) : null;
     const vStart = (+state.voice.delay || 0) - from; // posisi voice relatif terhadap potongan
 
@@ -6089,21 +6145,46 @@
       src.start(a, (((off % d) + d) % d) % src.loopEnd);
       src.stop(b);
     }
+    if (note) note('Mencampur audio…');
     return oc.startRendering();
   }
 
   // Jeda singkat yang tidak di-throttle walau tab tidak aktif
   const yieldUI = () => new Promise((r) => { const ch = new MessageChannel(); ch.port1.onmessage = () => r(); ch.port2.postMessage(0); });
 
+  // Seek yang tidak bisa menggantung: bila video berkali-kali tidak menjawab (umum di HP/tablet
+  // saat pemutar video "ditidurkan"), batas tunggunya diperpendek agar export tetap berjalan.
   function seekVideo(el, time) {
     return new Promise((res) => {
-      if (Math.abs(el.currentTime - time) < 0.001) return res();
-      const finish = () => { el.removeEventListener('seeked', finish); clearTimeout(to); res(); };
-      const to = setTimeout(finish, 1500);
-      el.addEventListener('seeked', finish);
+      if (Math.abs(el.currentTime - time) < 0.001 && el.readyState >= 2) return res();
+      const miss = el._seekMiss || 0;
+      const finish = (okay) => { el.removeEventListener('seeked', onSeeked); clearTimeout(to); el._seekMiss = okay ? 0 : miss + 1; if (!okay) seekStats.miss++; res(); };
+      const onSeeked = () => finish(true);
+      const to = setTimeout(() => finish(false), miss >= 3 ? 500 : 2500);
+      el.addEventListener('seeked', onSeeked);
       el.currentTime = time;
     });
   }
+  const seekStats = { miss: 0 };
+
+  // Bangunkan semua video sebelum export: browser HP sering belum memuat / menidurkan video yang dijeda
+  async function warmVideos(ctl) {
+    const vids = [...mediaEls.values()].map((e) => e.el).filter((el) => el instanceof HTMLVideoElement && el.src);
+    for (let k = 0; k < vids.length; k++) {
+      const el = vids[k];
+      if (el.readyState >= 2) continue;
+      ctl.progress(0, `Menyiapkan video ${k + 1}/${vids.length}…`);
+      const wasMuted = el.muted; el.muted = true;
+      if (el.readyState === 0 && el.networkState !== 2) { try { el.load(); } catch (_) { /* abaikan */ } }
+      try { await Promise.race([el.play(), new Promise((r) => setTimeout(r, 1500))]); } catch (_) { /* abaikan */ }
+      const t0 = performance.now();
+      while (el.readyState < 2 && performance.now() - t0 < 5000) await new Promise((r) => setTimeout(r, 100));
+      el.pause(); el.muted = wasMuted;
+    }
+  }
+
+  // Tunggu dengan batas waktu: encoder yang macet tidak boleh membuat export menggantung selamanya
+  const withTimeout = (p, ms, msg) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error(msg)), ms))]);
 
   async function exportWebCodecs(ctl, range = null) {
     let cancelled = false;
@@ -6118,11 +6199,15 @@
     let abuf = null, acfg = null;
     if (anyAudio()) {
       ctl.progress(0, 'Menyiapkan audio…');
-      abuf = await renderAudioOffline(total, from);
+      abuf = await renderAudioOffline(total, from, (m) => ctl.progress(0, m));
+      if (cancelled) return null;
       acfg = await pickAudioConfig(abuf.sampleRate);
       if (!acfg) throw new Error('encoder audio tidak tersedia');
       offlineAudio = { data: abuf.getChannelData(0), sr: abuf.sampleRate, t: 0 };
     }
+    await warmVideos(ctl);
+    if (cancelled) return null;
+    seekStats.miss = 0;
 
     const muxer = new Mp4Muxer.Muxer({
       target: new Mp4Muxer.ArrayBufferTarget(),
@@ -6147,8 +6232,10 @@
         const ad = new AudioData({ format: 'f32-planar', sampleRate: sr, numberOfFrames: n, numberOfChannels: 2, timestamp: Math.round((off / sr) * 1e6), data });
         aenc.encode(ad);
         ad.close();
+        if (aenc.encodeQueueSize > 64) { const tq = performance.now(); while (aenc.encodeQueueSize > 16 && !encErr) { if (performance.now() - tq > 15000) throw new Error('encoder audio berhenti merespons'); await yieldUI(); } }
       }
-      await aenc.flush();
+      ctl.progress(0, 'Menyandikan audio…');
+      await withTimeout(aenc.flush(), 60000, 'encoder audio berhenti merespons');
       aenc.close();
     }
 
@@ -6168,9 +6255,15 @@
       const vf = new VideoFrame(canvas, { timestamp: i * frameDur, duration: frameDur });
       venc.encode(vf, { keyFrame: i % (fps * 2) === 0 });
       vf.close();
-      while (venc.encodeQueueSize > 6) await yieldUI();
+      if (venc.encodeQueueSize > 6) {
+        const tq = performance.now();
+        while (venc.encodeQueueSize > 6 && !encErr) {
+          if (performance.now() - tq > 15000) throw new Error('encoder video di perangkat ini berhenti merespons — coba resolusi lebih kecil');
+          await new Promise((r) => setTimeout(r, 4));
+        }
+      }
       if (i % 4 === 0) {
-        ctl.progress(i / frames, `Merender frame ${i + 1} / ${frames}`);
+        ctl.progress(i / frames, `Merender frame ${i + 1} / ${frames}${seekStats.miss > 10 ? ' • video lambat dibaca perangkat' : ''}`);
         await yieldUI();
       }
     }
@@ -6178,7 +6271,8 @@
     if (cancelled) { try { venc.close(); } catch (_) { /* abaikan */ } return null; }
 
     ctl.progress(1, 'Menyusun file MP4…');
-    await venc.flush();
+    await withTimeout(venc.flush(), 60000, 'encoder video tidak selesai — coba resolusi lebih kecil');
+    if (encErr) throw encErr;
     venc.close();
     muxer.finalize();
     return { blob: new Blob([muxer.target.buffer], { type: 'video/mp4' }), ext: 'mp4' };

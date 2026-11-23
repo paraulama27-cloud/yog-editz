@@ -1196,3 +1196,5 @@ svg.i { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-widt
   .toasts { pointer-events: none; }
   .toast button, .toast a { pointer-events: auto; }
 }
+
+.em-stall { margin: -4px 0 14px; padding: 8px 10px; border-radius: 8px; font-size: 12.5px; line-height: 1.45; background: rgba(255, 170, 0, .12); border: 1px solid rgba(255, 170, 0, .4); }

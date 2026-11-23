@@ -1,7 +1,7 @@
 /* Service worker: membuat aplikasi bisa di-install dan dipakai offline.
    - File aplikasi: network-first (selalu versi terbaru bila online, cache bila offline)
    - Google Fonts: cache-first */
-const CACHE = 'yog-v20';
+const CACHE = 'yog-v21';
 const APP_FILES = [
   './',
   'index.html',
