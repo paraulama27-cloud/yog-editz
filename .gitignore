@@ -1,0 +1,10 @@
+output/*
+!output/.gitkeep
+*.mp4
+*.webm
+node_modules/
+.DS_Store
+Thumbs.db
+models/
+js/vendor/transformers/*.wasm
+.groq-key

@@ -1,0 +1,1205 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>YOG-EDITZ</title>
+  <meta name="description" content="YOG-EDITZ — editor video lengkap di browser: potong, transisi, efek, filter, teks, subtitle otomatis, audio, dan export MP4." />
+  <meta name="theme-color" content="#0f1117" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <script>try { document.documentElement.dataset.theme = localStorage.getItem('evkk:theme') || 'dark'; } catch (e) {}</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,600;0,800;1,400&family=Montserrat:ital,wght@0,400;0,600;0,800;1,400&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lora:ital,wght@0,400;0,600;1,400&family=Dancing+Script:wght@400;700&family=Bebas+Neue&family=Caveat:wght@400;700&family=Anton&family=Oswald:wght@400;700&family=Pacifico&family=Lobster&family=Righteous&family=Permanent+Marker&family=Roboto+Slab:wght@400;700&family=Raleway:ital,wght@0,400;0,800;1,400&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <img src="icons/icon.svg" alt="" width="22" height="22" />
+      <span class="brand-name">YOG-EDITZ</span>
+      <details class="menu">
+        <summary class="btn-like ghost" title="Menu project">Menu ▾</summary>
+        <div class="menu-pop">
+          <button id="btnProjects" class="menu-item" title="Semua project yang tersimpan di browser ini">📁 Project Saya</button>
+          <button id="btnNew" class="menu-item" title="Project baru">＋ Project baru</button>
+          <label class="menu-item btn-like" title="Buka project dari file .json">📂 Buka file project<input id="fileProject" type="file" accept=".json,application/json" hidden /></label>
+          <button id="btnSaveProject" class="menu-item" title="Simpan project ke file .json">💾 Simpan ke file <kbd>Ctrl+S</kbd></button>
+          <button id="btnHelp" class="menu-item" title="Pintasan keyboard (?)">⌨ Pintasan keyboard</button>
+          <span class="menu-ver">YOG-EDITZ v1.0</span>
+        </div>
+      </details>
+    </div>
+    <div class="top-center">
+      <input id="projectName" class="project-name" type="text" maxlength="60" title="Nama project (dipakai untuk nama file)" />
+      <span id="saveState" class="save-state">Tersimpan ✓</span>
+    </div>
+    <div class="top-actions">
+      <button id="btnTheme" class="ghost icon-btn" title="Ganti tema terang / gelap">☀</button>
+      <button id="btnOpenExport" class="export-btn" title="Export video (Ctrl+E untuk langsung export)">
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M12 15V4m0 0l-4 4m4-4l4 4M5 14v4a2 2 0 002 2h10a2 2 0 002-2v-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Export
+      </button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <!-- PANEL KIRI: PENGATURAN -->
+    <section class="panel">
+      <nav class="tabs">
+        <button class="tab active" data-tab="bg" title="Media"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9.5v5l4.5-2.5z" fill="currentColor" stroke="none"/></svg><span>Media</span></button>
+        <button class="tab" data-tab="musik" title="Audio"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg><span>Audio</span></button>
+        <button class="tab" data-tab="teks" title="Teks"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6V4h14v2M12 4v16M9 20h6"/></svg><span>Teks</span></button>
+        <button class="tab" data-tab="stiker" title="Stiker"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8.5 14.5a4.5 4.5 0 007 0"/><path d="M9 9.5h.01M15 9.5h.01" stroke-width="3"/></svg><span>Stiker</span></button>
+        <button class="tab" data-tab="efek" title="Efek"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 4.7 4.7 1.8-4.7 1.8L12 16l-1.8-4.7-4.7-1.8 4.7-1.8z"/><path d="M18 15l.8 2.2 2.2.8-2.2.8L18 21l-.8-2.2L15 18l2.2-.8z"/></svg><span>Efek</span></button>
+        <button class="tab" data-tab="transisi" title="Transisi"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="6" width="8" height="12" rx="1.5"/><rect x="13.5" y="6" width="8" height="12" rx="1.5"/><path d="M9 12h6M13 10l2 2-2 2"/></svg><span>Transisi</span></button>
+        <button class="tab" data-tab="subtitle" title="Teks otomatis"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 12h4M13 12h4M7 15.5h7"/></svg><span>Teks otomatis</span></button>
+        <button class="tab" data-tab="filter" title="Filter"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="9" r="5.5"/><circle cx="15" cy="9" r="5.5"/><circle cx="12" cy="14.5" r="5.5"/></svg><span>Filter</span></button>
+        <button class="tab" data-tab="adjust" title="Penyesuaian"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg><span>Penyesuaian</span></button>
+        <button class="tab" data-tab="template" title="Template"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="5" rx="1.5"/><rect x="13" y="10" width="8" height="11" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/></svg><span>Template</span></button>
+      </nav>
+
+      <!-- MEDIA: impor & perpustakaan -->
+      <div class="tab-body active" id="tab-bg">
+        <h3>Impor</h3>
+        <label class="file-btn primary-file upload-main">＋ Upload foto / video<input id="fileMediaTop" type="file" accept="image/*,video/*,.mp4,.mov,.mkv,.webm,.avi,.m4v,.3gp,.jpg,.jpeg,.png,.webp,.gif,.heic,.heif" multiple hidden /></label>
+        <p class="muted">Pilih banyak file sekaligus, atau seret file ke sini / ke pemutar. Media masuk ke perpustakaan; klik <b>＋</b> atau seret ke timeline untuk memakainya.</p>
+        <div class="row between lib-head">
+          <span class="muted" id="libCount"></span>
+          <button id="btnLibAddAll" class="ghost small" title="Tambahkan semua media ke akhir track utama">＋ Semua ke timeline</button>
+        </div>
+          <div id="mediaLib" class="media-lib"></div>
+          <label id="slideDurRow" class="hidden">Durasi bawaan foto (detik)
+            <input id="slideDur" type="number" min="0.5" max="60" step="0.5" />
+          </label>
+          <label class="check"><input id="vsoundOn" type="checkbox" /> 🔊 Suara asli video ikut terdengar &amp; terekam</label>
+          <label>Volume suara video <input id="vsoundVol" type="range" min="0" max="1" step="0.05" /> <output data-for="vsoundVol"></output></label>
+
+        <!-- Posisi & penyesuaian foto / video yang dipilih -->
+        <div id="mediaAdjust" class="hidden">
+          <h3>Atur media: <span id="selMediaName" class="sel-name"></span></h3>
+          <button id="btnUseMain" class="ghost small hidden">Pakai media ini untuk semua scene</button>
+          <p class="muted">💡 Tarik foto langsung di preview untuk menggeser, scroll mouse di atas preview untuk zoom (saat video dijeda).</p>
+          <label>Durasi tampil (dtk)
+            <input id="mediaDur" type="number" min="0.5" max="600" step="0.5" />
+          </label>
+          <p class="muted dur-hint">Kosongkan = bawaan (video: sepanjang videonya, foto: durasi bawaan). Bisa juga ditarik di baris latar timeline.</p>
+          <label>Mode tampil
+            <select id="imgFit">
+              <option value="cover">Penuhi layar (dipotong)</option>
+              <option value="contain">Tampil utuh (latar hitam)</option>
+              <option value="blurfill">Tampil utuh + latar blur</option>
+            </select>
+          </label>
+          <label>Zoom <input id="imgZoom" type="range" min="0.3" max="5" step="0.01" /> <output data-for="imgZoom"></output></label>
+          <div class="grid2">
+            <label>Geser kiri–kanan <input id="imgX" type="range" min="-1" max="1" step="0.005" /></label>
+            <label>Geser atas–bawah <input id="imgY" type="range" min="-1" max="1" step="0.005" /></label>
+          </div>
+          <label>Putar <input id="imgRotate" type="range" min="-180" max="180" step="1" /> <output data-for="imgRotate"></output>°</label>
+          <label class="check"><input id="imgFlip" type="checkbox" /> Cerminkan (balik kiri–kanan)</label>
+          <label class="check" id="imgMuteRow"><input id="imgMute" type="checkbox" /> 🔇 Bisukan suara video ini</label>
+          <div class="row gap">
+            <button id="btnImgCenter" class="ghost small">⊕ Ke tengah</button>
+            <button id="btnImgReset" class="ghost small">↺ Reset posisi</button>
+          </div>
+          <label id="imgMotionRow">Gerak foto
+            <select id="bgMotion">
+              <option value="none">Diam</option>
+              <option value="zoomIn">Zoom masuk pelan</option>
+              <option value="zoomOut">Zoom keluar pelan</option>
+              <option value="panLeft">Geser ke kiri pelan</option>
+              <option value="panRight">Geser ke kanan pelan</option>
+            </select>
+          </label>
+
+          <h3>Warna foto / video</h3>
+          <label>Kecerahan <input id="bgBright" type="range" min="0.3" max="1.8" step="0.05" /> <output data-for="bgBright"></output></label>
+          <label>Kontras <input id="bgContrast" type="range" min="0.5" max="1.8" step="0.05" /> <output data-for="bgContrast"></output></label>
+          <label>Saturasi <input id="bgSat" type="range" min="0" max="2" step="0.05" /> <output data-for="bgSat"></output></label>
+          <button id="btnColorReset" class="ghost small">↺ Reset warna</button>
+        </div>
+      </div>
+
+      <!-- TAB MUSIK -->
+      <div class="tab-body" id="tab-musik">
+        <h3>Musik latar</h3>
+        <label class="file-btn">Pilih file audio<input id="fileAudio" type="file" accept="audio/*" hidden /></label>
+        <span id="audioName" class="muted">Belum ada musik</span>
+        <button id="btnRemoveAudio" class="ghost small">Hapus musik</button>
+        <label>Volume <input id="volume" type="range" min="0" max="1" step="0.05" /> <output data-for="volume"></output></label>
+        <label>Mulai dari detik ke- <input id="audioStart" type="number" min="0" step="0.5" /></label>
+        <label class="check"><input id="audioFade" type="checkbox" /> Fade out di akhir video</label>
+        <p class="muted">Gunakan musik yang kamu punya haknya / bebas royalti.</p>
+
+        <h3>🥁 Ketukan musik (beat sync)</h3>
+        <p class="muted">Deteksi tempo lagu, tampilkan penanda ketukan di timeline, lalu buat klip latar berganti tepat di ketukan.</p>
+        <div class="row gap beat-row">
+          <select id="beatSrc" title="Lagu yang dianalisis"></select>
+          <button id="btnBeatDetect">🥁 Deteksi ketukan</button>
+        </div>
+        <p id="beatInfo" class="muted">Belum dideteksi</p>
+        <label>Ganti klip tiap
+          <select id="beatEvery"><option value="1">1 ketukan</option><option value="2">2 ketukan</option><option value="4">4 ketukan (1 bar)</option><option value="8">8 ketukan (2 bar)</option></select>
+        </label>
+        <div class="row gap">
+          <button id="btnBeatClips" class="primary">Klip latar ikut ketukan</button>
+          <button id="btnBeatTexts" class="ghost">Teks ikut ketukan</button>
+        </div>
+        <label class="check"><input id="beatShow" type="checkbox" /> Tampilkan penanda ketukan di timeline</label>
+        <label class="check"><input id="beatSnap" type="checkbox" /> Tempel ke ketukan saat menggeser di timeline</label>
+        <label title="Geser semua ketukan bila terasa terlalu cepat/lambat">Geser ketukan (milidetik) <input id="beatNudge" type="number" step="10" /></label>
+
+        <h3>Voice-over (suara)</h3>
+        <div class="row gap">
+          <button id="btnRecord">🎙 Rekam suara</button>
+          <label class="file-btn">Upload suara<input id="fileVoice" type="file" accept="audio/*" hidden /></label>
+          <button id="btnRemoveVoice" class="ghost small">Hapus</button>
+        </div>
+        <span id="voiceName" class="muted">Belum ada voice-over</span>
+        <label>Volume suara <input id="voiceVolume" type="range" min="0" max="2" step="0.05" /> <output data-for="voiceVolume"></output></label>
+        <label>Mulai di detik ke- <input id="voiceDelay" type="number" min="0" step="0.1" /></label>
+        <label class="check"><input id="voiceDuck" type="checkbox" /> Kecilkan musik saat ada suara (ducking)</label>
+        <div class="row gap voice-fx">
+          <label>🎭 Pengubah suara <select id="voicePitch"></select></label>
+          <label>Efek <select id="voiceFx"></select></label>
+        </div>
+        <div class="voice-clean">
+          <label title="Mengurangi desis, dengung kipas/AC, dan suara latar yang konstan">✨ Hapus bising <input id="voiceDenoise" type="range" min="0" max="100" step="5" value="60" /> <output id="voiceDenoiseOut"></output></label>
+          <label class="check"><input id="voiceNorm" type="checkbox" checked /> Ratakan volume (suara pelan dikeraskan, puncak dilunakkan)</label>
+          <div class="row gap">
+            <button id="btnVoiceClean" class="primary">✨ Perjelas suara</button>
+            <button id="btnVoiceOrig" class="ghost small hidden">↺ Suara asli</button>
+          </div>
+        </div>
+        <p class="muted">Saat merekam, video diputar dari awal tanpa musik. Rekaman berhenti otomatis di akhir video.</p>
+
+        <h3 id="secTts">🗣 Teks ke suara (AI)</h3>
+        <div class="tts-box">
+          <p class="muted">Teks dibacakan suara AI bahasa Indonesia. Berjalan di komputer ini (tanpa kirim data ke internet). Pertama kali perlu memuat model ±110 MB; jalankan <b>UNDUH-MODEL-AI.bat</b> → pilihan <i>Teks ke suara</i> agar bisa offline.</p>
+          <div class="row gap">
+            <button id="btnTtsFill" class="ghost small" title="Isi dengan semua teks di project">Ambil teks project</button>
+            <button id="btnTtsClear" class="ghost small">Kosongkan</button>
+          </div>
+          <textarea id="ttsText" placeholder="Tulis teks yang akan dibacakan…"></textarea>
+          <div class="tts-row">
+            <label>Hasil
+              <select id="ttsMode">
+                <option value="voice">Jadikan voice-over</option>
+                <option value="each">Per teks → track audio di waktu tiap teks</option>
+                <option value="track">Track audio di posisi playhead</option>
+              </select>
+            </label>
+            <label title="Jeda di antara kalimat">Jeda kalimat (dtk) <input id="ttsGap" type="number" min="0" max="3" step="0.1" value="0.4" /></label>
+          </div>
+          <div class="row gap">
+            <button id="btnTts" class="primary">🗣 Buat suara</button>
+            <button id="btnTtsPlay" class="ghost small hidden" title="Dengar hasil terakhir">▶ Dengar</button>
+          </div>
+          <span id="ttsStatus" class="muted"></span>
+          <p class="muted">Angka ditulis ulang jadi kata (mis. 25 → dua puluh lima). Atur nada / efek lewat 🎭 Pengubah suara di atas. Model suara: MMS (Meta), lisensi non-komersial (CC BY-NC 4.0).</p>
+        </div>
+
+        <h3>🎚 Track audio tambahan</h3>
+        <p class="muted">Lagu atau efek suara tambahan di posisi playhead. Muncul di timeline: geser, tarik tepi untuk trim, klik untuk atur volume, fade &amp; efek suara. <kbd>S</kbd> memotong track yang dipilih.</p>
+        <label class="file-btn primary-file">＋ Tambah audio (bisa banyak)<input id="fileAudioTrack" type="file" accept="audio/*,video/*" multiple hidden /></label>
+        <p class="muted">Efek suara bawaan:</p>
+        <div id="sfxList" class="sfx-list"></div>
+        <div id="audioList" class="audio-list"></div>
+      </div>
+
+      <!-- TEKS -->
+      <div class="tab-body" id="tab-teks">
+        <h3>Tambah teks</h3>
+        <div class="row gap add-text-row">
+          <button id="btnAddScene" class="primary">＋ Teks default</button>
+        </div>
+        <p class="muted">Template teks (klik = tambah di playhead, lengkap dengan gaya &amp; animasi):</p>
+        <div id="txTplGrid" class="tx-tpl-grid"></div>
+          <div id="videoDurRow">
+            <label>Durasi video (dtk)
+              <input id="videoDur" type="number" min="1" max="600" step="0.5" />
+            </label>
+            <label class="check small-check"><input id="durFromBg" type="checkbox" /> Ikut latar</label>
+          </div>
+        <p id="durHint" class="muted dur-hint"></p>
+        <div class="row between">
+          <h3 id="textHeading">Lapisan teks</h3>
+          <span id="totalDur" class="muted"></span>
+        </div>
+        <p class="muted hint">💡 Klik teks di timeline untuk mengatur di panel Properti. Tulis <b>*kata*</b> untuk menyorot kata.</p>
+        <div id="sceneList"></div>
+
+        <h3>Gaya teks</h3>
+        <div class="grid2">
+          <label>Font
+            <select id="font">
+              <option>Poppins</option><option>Montserrat</option><option>Playfair Display</option>
+              <option>Lora</option><option>Merriweather</option><option>Dancing Script</option>
+              <option>Caveat</option><option>Bebas Neue</option>
+              <option>Anton</option><option>Oswald</option><option>Pacifico</option><option>Lobster</option>
+              <option>Righteous</option><option>Permanent Marker</option><option>Roboto Slab</option><option>Raleway</option>
+            </select>
+          </label>
+          <label>Ketebalan
+            <select id="weight"><option value="400">Normal</option><option value="600">Tebal</option><option value="800">Sangat tebal</option></select>
+          </label>
+          <label>Warna teks <input id="color" type="color" /></label>
+          <label>Warna penulis <input id="authorColor" type="color" /></label>
+          <label>Warna sorotan <input id="highlightColor" type="color" /></label>
+        </div>
+        <label class="file-btn">+ Upload font sendiri (.ttf / .otf)<input id="fileFont" type="file" accept=".ttf,.otf,.woff,.woff2" hidden /></label>
+        <label>Ukuran <input id="size" type="range" min="28" max="160" step="2" /> <output data-for="size"></output></label>
+        <label>Jarak baris <input id="lineHeight" type="range" min="1" max="2" step="0.05" /> <output data-for="lineHeight"></output></label>
+        <label>Jarak huruf <input id="letterSpacing" type="range" min="-2" max="20" step="1" /> <output data-for="letterSpacing"></output></label>
+        <label>Posisi vertikal <input id="posY" type="range" min="0.15" max="0.85" step="0.01" /> <output data-for="posY"></output></label>
+        <div class="seg" id="align">
+          <button data-v="left">Kiri</button><button data-v="center">Tengah</button><button data-v="right">Kanan</button>
+        </div>
+        <label class="check"><input id="shadow" type="checkbox" /> Bayangan teks</label>
+        <label class="check"><input id="uppercase" type="checkbox" /> HURUF BESAR</label>
+        <label class="check"><input id="italic" type="checkbox" /> Miring</label>
+        <label>Gaya kata yang disorot (*kata*)
+          <select id="hlStyle">
+            <option value="color">Warna</option>
+            <option value="marker">Stabilo (latar berwarna)</option>
+            <option value="underline">Garis bawah</option>
+          </select>
+        </label>
+        <label class="check"><input id="textGradient" type="checkbox" /> Teks bergradasi</label>
+        <label>Warna gradasi bawah <input id="color2" type="color" /></label>
+        <label class="check"><input id="glow" type="checkbox" /> Glow / neon</label>
+        <label class="check"><input id="float" type="checkbox" /> Teks mengambang pelan</label>
+        <label class="check"><input id="stroke" type="checkbox" /> Garis tepi (outline)</label>
+        <div class="grid2">
+          <label>Warna garis <input id="strokeColor" type="color" /></label>
+          <label>Tebal garis <input id="strokeWidth" type="range" min="1" max="20" step="1" /></label>
+        </div>
+        <label class="check"><input id="boxBg" type="checkbox" /> Kotak di belakang teks</label>
+        <div class="grid2">
+          <label>Warna kotak <input id="boxColor" type="color" /></label>
+          <label>Transparansi <input id="boxOpacity" type="range" min="0.1" max="1" step="0.05" /></label>
+        </div>
+
+        <h3>Animasi teks</h3>
+        <div class="grid2">
+          <label>Masuk
+            <select id="animType">
+              <option value="fade">Fade</option>
+              <option value="slideUp">Naik</option>
+              <option value="zoom">Zoom</option>
+              <option value="typewriter">Mesin tik</option>
+              <option value="word">Kata per kata</option>
+              <option value="blur">Blur ke jelas</option>
+              <option value="pop">Membal (pop)</option>
+              <option value="slideLeft">Geser dari kiri</option>
+              <option value="karaoke">Karaoke</option>
+              <option value="slideDown">Turun dari atas</option>
+              <option value="slideRight">Geser dari kanan</option>
+              <option value="zoomBig">Mengecil masuk</option>
+              <option value="spinIn">Berputar masuk</option>
+              <option value="drop">Jatuh memantul</option>
+              <option value="flipIn">Balik (flip)</option>
+              <option value="stretchIn">Regang</option>
+              <option value="riseBlur">Naik + blur</option>
+              <option value="glitchIn">Glitch</option>
+              <option value="flickerIn">Berkedip</option>
+              <optgroup label="Per huruf">
+                <option value="charPop">Huruf muncul satu-satu</option>
+                <option value="charRise">Huruf naik satu-satu</option>
+                <option value="charWave">Ombak (berulang)</option>
+                <option value="charBounce">Memantul (berulang)</option>
+                <option value="charFlicker">Berkedip per huruf</option>
+              </optgroup>
+            </select>
+          </label>
+          <label>Keluar
+            <select id="transition">
+              <option value="fade">Fade</option>
+              <option value="slideUp">Naik</option>
+              <option value="zoomOut">Zoom keluar</option>
+              <option value="blur">Blur</option>
+              <option value="slideDown">Turun</option>
+              <option value="slideLeftOut">Geser ke kiri</option>
+              <option value="slideRightOut">Geser ke kanan</option>
+              <option value="shrink">Mengecil</option>
+              <option value="spinOut">Berputar keluar</option>
+              <option value="popOut">Membal keluar</option>
+              <option value="flipOut">Balik (flip)</option>
+              <option value="dropOut">Jatuh</option>
+              <option value="glitchOut">Glitch</option>
+              <option value="flickerOut">Berkedip</option>
+              <option value="none">Langsung</option>
+            </select>
+          </label>
+        </div>
+        <div class="grid2">
+          <label title="0 = otomatis. Untuk mesin tik / kata per kata: lama sampai semua teks tampil">Lama masuk (dtk) <input id="animInDur" type="number" min="0" max="20" step="0.1" placeholder="otomatis" /></label>
+          <label title="0 = otomatis">Lama keluar (dtk) <input id="animOutDur" type="number" min="0" max="20" step="0.1" placeholder="otomatis" /></label>
+        </div>
+        <p class="muted">💡 Isi 0 untuk otomatis. Lama masuk/keluar dibatasi panjang tampil teks; perpanjang teks di timeline bila animasinya ingin lebih lama.</p>
+        <label>Kecepatan (saat otomatis) <input id="speed" type="range" min="0.5" max="2.5" step="0.1" /> <output data-for="speed"></output></label>
+      </div>
+
+      <!-- STIKER -->
+      <div class="tab-body" id="tab-stiker">
+        <h3>Stiker &amp; gambar</h3>
+        <p class="muted">Klik untuk menambah di posisi playhead. Stiker jadi lapisan di timeline: tarik di preview untuk memindah, scroll untuk ukuran, Shift+scroll untuk memutar. Atur animasi &amp; keyframe di tab Teks.</p>
+        <div id="emojiGrid" class="emoji-grid"></div>
+        <div class="row gap">
+          <input id="emojiCustom" type="text" maxlength="8" placeholder="Emoji lain…" />
+          <button id="btnEmojiCustom" class="small">+ Tambah</button>
+        </div>
+        <label class="file-btn primary-file">＋ Upload gambar / PNG transparan<input id="fileSticker" type="file" accept="image/*" multiple hidden /></label>
+
+        <h3>Overlay video / foto</h3>
+        <p class="muted">Tumpuk video atau foto di atas latar (picture-in-picture). Di kartunya bisa diberi bentuk (masking), hapus latar hijau (chroma key), bingkai, filter, mode campur, dan keyframe.</p>
+        <label class="file-btn primary-file">＋ Upload video / foto overlay<input id="fileOverlay" type="file" accept="image/*,video/*" multiple hidden /></label>
+
+        <h3>Logo &amp; watermark</h3>
+        <input id="watermark" type="text" placeholder="@akunmu (opsional)" />
+        <label class="file-btn">Pilih logo (PNG transparan)<input id="fileLogo" type="file" accept="image/*" hidden /></label>
+        <span id="logoName" class="muted"></span>
+        <button id="btnRemoveLogo" class="ghost small">Hapus logo</button>
+        <label>Posisi
+          <select id="logoPos">
+            <option value="tl">Kiri atas</option><option value="tc">Tengah atas</option><option value="tr">Kanan atas</option>
+            <option value="bl">Kiri bawah</option><option value="bc">Tengah bawah</option><option value="br">Kanan bawah</option>
+          </select>
+        </label>
+        <div class="grid2">
+          <label>Ukuran <input id="logoSize" type="range" min="0.05" max="0.5" step="0.01" /></label>
+          <label>Transparansi <input id="logoOpacity" type="range" min="0.1" max="1" step="0.05" /></label>
+        </div>
+      </div>
+
+      <!-- EFEK -->
+      <div class="tab-body" id="tab-efek">
+        <h3>Efek video</h3>
+        <p class="muted">💡 Klik efek = pasang di klip terpilih. Tombol <b>＋</b> di pojok = tambah sebagai <b>lapisan di timeline</b> (seluruh layar, mulai di playhead).</p>
+        <p class="muted" id="fxGridHint">Klik efek untuk memasangnya di klip yang dipilih di timeline. Belum memilih klip? Efek dipasang di seluruh video.</p>
+        <div class="row gap grid-tools">
+          <label class="grow-lbl">Kekuatan <input id="fxGridAmt" type="range" min="0" max="100" step="5" value="60" /> <output id="fxGridAmtOut"></output></label>
+          <button id="btnFxGridAll" class="ghost small" title="Pasang efek klip terpilih ke semua klip">⧉ Ke semua klip</button>
+        </div>
+        <div id="fxGrid" class="fx-grid"></div>
+
+        <h3>Partikel</h3>
+        <label>Jenis
+          <select id="particles">
+            <option value="none">Tidak ada</option>
+            <option value="snow">❄ Salju</option>
+            <option value="bokeh">◯ Bokeh cahaya</option>
+            <option value="stars">✦ Bintang berkelip</option>
+            <option value="rain">☂ Hujan</option>
+            <option value="dust">✧ Debu emas</option>
+            <option value="hearts">♥ Hati</option>
+          </select>
+        </label>
+        <label>Jumlah <input id="amount" type="range" min="0.2" max="2.5" step="0.1" /> <output data-for="amount"></output></label>
+
+        <h3>Sinematik</h3>
+        <label>Vignette (tepi gelap) <input id="vignette" type="range" min="0" max="0.9" step="0.05" /> <output data-for="vignette"></output></label>
+        <label class="check"><input id="grain" type="checkbox" /> Film grain (bintik film)</label>
+        <label class="check"><input id="progressBar" type="checkbox" /> Progress bar di bawah video</label>
+        <label class="check"><input id="fadeBlack" type="checkbox" /> Fade dari/ke hitam di awal &amp; akhir</label>
+
+        <h3>Dekorasi</h3>
+        <label>Bingkai
+          <select id="frame">
+            <option value="none">Tidak ada</option>
+            <option value="simple">Garis tipis</option>
+            <option value="double">Garis ganda</option>
+            <option value="corner">Sudut</option>
+            <option value="film">Bar film (sinema)</option>
+          </select>
+        </label>
+
+        <h3>Visualizer musik</h3>
+        <label>Jenis
+          <select id="visualizer">
+            <option value="none">Tidak ada</option>
+            <optgroup label="Garis lurus">
+              <option value="bars">Batang</option>
+              <option value="mirror">Batang cermin (atas-bawah)</option>
+              <option value="blocks">Blok LED</option>
+              <option value="dots">Titik-titik</option>
+              <option value="area">Area spektrum</option>
+              <option value="wave">Gelombang</option>
+              <option value="wave2">Gelombang berlapis</option>
+            </optgroup>
+            <optgroup label="Lingkaran">
+              <option value="circle">Lingkaran batang</option>
+              <option value="sun">Matahari (lingkaran + inti berdenyut)</option>
+              <option value="ring">Cincin gelombang</option>
+            </optgroup>
+          </select>
+        </label>
+
+        <label>Posisi cepat</label>
+        <div class="seg" id="vizPos">
+          <button data-y="0.14">Atas</button>
+          <button data-y="0.5">Tengah</button>
+          <button data-y="text">Bawah teks</button>
+          <button data-y="0.88">Bawah</button>
+        </div>
+        <div class="grid2">
+          <label>Posisi kiri–kanan <input id="vizX" type="range" min="0" max="1" step="0.01" /></label>
+          <label>Posisi atas–bawah <input id="vizY" type="range" min="0" max="1" step="0.01" /></label>
+          <label>Lebar / ukuran <input id="vizWidth" type="range" min="0.15" max="1" step="0.01" /></label>
+          <label>Tinggi / kepekaan <input id="vizHeight" type="range" min="0.3" max="2.5" step="0.05" /></label>
+          <label>Jumlah batang <input id="vizBars" type="range" min="8" max="128" step="1" /> <output data-for="vizBars"></output></label>
+          <label>Tebal garis <input id="vizThickness" type="range" min="0.25" max="4" step="0.25" /></label>
+        </div>
+
+        <div class="grid2">
+          <label>Warna
+            <select id="vizColor">
+              <option value="highlight">Warna sorotan</option>
+              <option value="text">Warna teks</option>
+              <option value="gradient">Gradasi teks → sorotan</option>
+              <option value="rainbow">Pelangi</option>
+              <option value="custom">Pilih sendiri…</option>
+            </select>
+          </label>
+          <label>Warna sendiri <input id="vizCustomColor" type="color" /></label>
+        </div>
+        <label>Transparansi <input id="vizOpacity" type="range" min="0.1" max="1" step="0.05" /></label>
+        <label class="check"><input id="vizGlow" type="checkbox" /> Efek cahaya (glow)</label>
+        <p class="muted">💡 Tarik visualizer langsung di preview untuk memindahkannya (saat video dijeda). Saat dijeda ditampilkan gerakan contoh; saat diputar & di-export bergerak mengikuti musik / voice-over.</p>
+      </div>
+
+      <!-- TRANSISI -->
+      <div class="tab-body" id="tab-transisi">
+        <h3>Transisi</h3>
+        <p class="muted" id="trGridHint">Pilih klip di timeline, lalu klik transisi: dipasang di awal klip itu (peralihan dari klip sebelumnya). Belum memilih klip? Dipasang di semua klip.</p>
+        <div class="row gap grid-tools">
+          <label class="grow-lbl">Durasi (dtk) <input id="trGridDur" type="number" min="0.1" max="5" step="0.1" value="0.6" /></label>
+          <button id="btnTrGridAll" class="ghost small" title="Pakai transisi klip terpilih di semua klip">⧉ Ke semua klip</button>
+        </div>
+        <div id="trGrid" class="fx-grid"></div>
+
+        <h3 id="fxListTitle">🎬 Daftar transisi tiap klip</h3>
+        <p id="fxListHint" class="muted">Semua klip ada di sini. Pilih transisi, filter, dan efeknya; hasilnya langsung diputar. Kosong / "Ikut latar" = memakai pengaturan bawaan di bawah.</p>
+        <div class="row gap fx-tools">
+          <button id="btnFxRandAll" class="ghost small" title="Beri tiap klip transisi acak yang berbeda">🎲 Acak semua</button>
+          <button id="btnFxResetAll" class="ghost small" title="Kembalikan semua klip ke pengaturan bawaan">↺ Reset semua</button>
+          <button id="btnFxPlayAll" class="ghost small" title="Putar video dari awal">▶ Putar dari awal</button>
+        </div>
+        <div id="fxList" class="fx-list"></div>
+
+        <h3>Transisi bawaan</h3>
+        <p class="muted">Dipakai bila klip tidak diberi transisi sendiri.</p>
+        <div class="grid2">
+          <label>Transisi <select id="bgXTrans"></select></label>
+          <label>Lama transisi (dtk) <input id="bgXDur" type="number" min="0.1" max="5" step="0.1" /></label>
+        </div>
+      </div>
+
+      <!-- TAB SUBTITLE / TEKS OTOMATIS -->
+      <div class="tab-body" id="tab-subtitle">
+        <h3>✨ Teks otomatis</h3>
+        <p class="muted">Ubah suara jadi subtitle otomatis lengkap dengan waktunya, memakai AI (Whisper) yang berjalan langsung di browser. Model AI diunduh sekali (butuh internet), setelah itu tersimpan.</p>
+        <div class="grid2">
+          <label>Sumber suara
+            <select id="capSource">
+              <option value="voice">Voice-over</option>
+              <option value="music">Musik / lagu</option>
+              <option value="video">Suara video latar</option>
+            </select>
+          </label>
+          <label>Bahasa
+            <select id="capLang">
+              <option value="indonesian">Indonesia</option>
+              <option value="english">Inggris</option>
+              <option value="malay">Melayu</option>
+              <option value="javanese">Jawa</option>
+              <option value="arabic">Arab</option>
+              <option value="auto">Deteksi otomatis</option>
+            </select>
+          </label>
+        </div>
+        <label>Mesin teks otomatis
+          <select id="capEngine">
+            <option value="local">AI di komputer ini (gratis, tanpa internet)</option>
+            <option value="groq">Groq Whisper online (sangat cepat &amp; akurat)</option>
+          </select>
+        </label>
+        <div id="groqBox" class="groq-box">
+          <label>Model Groq
+            <select id="capGroqModel">
+              <option value="whisper-large-v3">Whisper large-v3 — paling akurat</option>
+              <option value="whisper-large-v3-turbo">Whisper large-v3 turbo — lebih cepat, kuota lebih hemat</option>
+            </select>
+          </label>
+          <div class="groq-key-row">
+            <input id="groqKey" type="password" placeholder="Tempel API key Groq (gsk_…)" autocomplete="off" spellcheck="false" />
+            <button id="btnGroqSave" class="small">Simpan</button>
+            <button id="btnGroqDel" class="ghost small" title="Hapus key dari komputer ini">Hapus</button>
+          </div>
+          <p id="groqStatus" class="muted"></p>
+          <p class="muted">Key disimpan di server lokal (file <b>.groq-key</b> di folder aplikasi), tidak di browser. Audio dikirim ke Groq hanya saat menekan "Buat teks otomatis". Butuh internet & START.bat berjalan.</p>
+        </div>
+        <label id="capModelWrap">Model AI
+          <select id="capModel">
+            <option value="small">Akurat (±250 MB) — disarankan</option>
+            <option value="base">Cepat (±77 MB)</option>
+            <option value="turbo">Terbaik (±620 MB, paling pas untuk bahasa Indonesia, butuh PC kuat)</option>
+          </select>
+        </label>
+        <label>Ejaan teks
+          <select id="capRef">
+            <option value="none">Tulis persis seperti yang didengar AI</option>
+            <option value="scenes">Samakan dengan lapisan teks di video (voice-over membacakannya)</option>
+            <option value="script">Samakan dengan naskah di bawah</option>
+          </select>
+        </label>
+        <p class="muted">💡 Agar teks 100% benar: kalau voice-over membacakan teks di video / naskah, pilih "Samakan dengan…". Ejaan diambil dari teks kamu, waktu tiap kata dari AI.</p>
+        <button id="btnAutoCap" class="primary big">✨ Buat teks otomatis</button>
+        <div id="capProgress" class="progress hidden"><div></div></div>
+        <p id="capStatus" class="muted"></p>
+        <div id="capNoVoice" class="cap-novoice hidden">
+          <b>Teks otomatis butuh suara orang berbicara atau bernyanyi.</b>
+          <p class="muted">AI mengubah <i>ucapan</i> jadi teks. Video tanpa suara atau musik instrumental (tanpa vokal) tidak punya kata untuk didengar. Pilihan lain:</p>
+          <ul class="muted">
+            <li>Rekam / upload voice-over di tab Audio, lalu pilih sumber <b>Voice-over</b>.</li>
+            <li>Pakai lagu yang ada liriknya, lalu pilih sumber <b>Musik / lagu</b>.</li>
+            <li>Atau biarkan AI membacakan teks project:</li>
+          </ul>
+          <button id="btnCapTts" class="primary">🗣 Buat voice-over AI dari teks, lalu subtitle</button>
+        </div>
+
+        <details class="bulk">
+          <summary>Dari naskah (tanpa AI, tanpa internet)</summary>
+          <p class="muted">Tempel naskah yang dibacakan. Bisa dipakai dua cara: (1) dengan AI, pilih "Samakan dengan naskah" di atas lalu klik ✨ (waktu presisi per kata), atau (2) tanpa AI, klik tombol di bawah (waktu diperkirakan dari panjang voice-over).</p>
+          <textarea id="capScript" rows="5" placeholder="Tempel naskah di sini…"></textarea>
+          <button id="btnCapScript">Bagi &amp; atur waktu otomatis (tanpa AI)</button>
+        </details>
+
+        <h3 id="secCapTpl">🎨 Template subtitle</h3>
+        <p class="muted">Klik template untuk langsung memakai gayanya (font, warna, animasi, sorot kata). Semua masih bisa diubah di bawah.</p>
+        <div id="capTplGrid" class="cap-tpl-grid"></div>
+
+        <h3>Tampilan subtitle</h3>
+        <label class="check"><input id="capShow" type="checkbox" /> Tampilkan subtitle di video</label>
+        <div class="grid2">
+          <label>Gaya
+            <select id="capStyle"></select>
+          </label>
+          <label>Maks kata per tampilan <input id="capMaxWords" type="number" min="1" max="20" step="1" /></label>
+          <label>Font
+            <select id="capFont"></select>
+          </label>
+          <label>Ketebalan
+            <select id="capWeight"><option value="400">Normal</option><option value="600">Tebal</option><option value="700">Lebih tebal</option><option value="800">Sangat tebal</option></select>
+          </label>
+          <label>Warna teks <input id="capColor" type="color" /></label>
+          <label>Warna kata aktif / sorot <input id="capHl" type="color" /></label>
+          <label>Ukuran <input id="capSize" type="range" min="28" max="130" step="2" /></label>
+          <label>Posisi atas ↕ bawah <input id="capY" type="range" min="0.08" max="0.95" step="0.01" /></label>
+          <label>Lebar baris <input id="capWidth" type="range" min="0.3" max="0.98" step="0.02" /></label>
+          <label>Jarak huruf <input id="capSpacing" type="range" min="-2" max="12" step="0.5" /></label>
+          <label>Kemiringan (°) <input id="capRot" type="range" min="-12" max="12" step="1" /></label>
+        </div>
+        <div class="row gap">
+          <label class="check"><input id="capUpper" type="checkbox" /> HURUF BESAR</label>
+          <label class="check"><input id="capItalic" type="checkbox" /> Miring</label>
+          <label class="check"><input id="capGlow" type="checkbox" /> Bersinar</label>
+        </div>
+        <div class="grid2 cap-box-opts">
+          <label>Warna kotak <input id="capBoxColor" type="color" /></label>
+          <label>Transparansi kotak <input id="capBoxOpacity" type="range" min="0.1" max="1" step="0.05" /></label>
+          <label>Warna garis tepi <input id="capStrokeColor" type="color" /></label>
+          <label>Tebal garis tepi <input id="capStrokeW" type="range" min="0.04" max="0.36" step="0.02" /></label>
+        </div>
+
+        <h3>✨ Efek subtitle</h3>
+        <div class="grid2">
+          <label>Animasi masuk <select id="capAnim"></select></label>
+          <label>Animasi keluar <select id="capAnimOut"></select></label>
+          <label>Sorot kata yang diucapkan <select id="capHlMode"></select></label>
+        </div>
+        <label class="check"><input id="capKaraoke" type="checkbox" /> Sorot kata yang sedang diucapkan (karaoke)</label>
+        <p class="muted">Tulis <b>*kata*</b> di teks subtitle untuk memberi warna sorot tetap pada kata itu.</p>
+        <label>Geser waktu subtitle <input id="capOffset" type="range" min="-1" max="1" step="0.02" /> <output data-for="capOffset"></output> dtk</label>
+        <p class="muted">Minus = subtitle muncul lebih awal, plus = lebih lambat. Biasanya tidak perlu diubah.</p>
+        <p class="muted">"Maks kata per tampilan" berlaku saat membuat teks otomatis berikutnya.</p>
+
+        <div class="row between"><h3>Daftar subtitle <span id="capCount"></span></h3></div>
+        <div class="cap-head"><span>Mulai</span><span>Selesai</span><span>Teks</span></div>
+        <div id="capList" class="cap-list"></div>
+        <div class="row gap">
+          <button id="btnCapAdd" class="ghost small">+ Tambah baris</button>
+          <button id="btnCapClear" class="ghost small">Hapus semua</button>
+        </div>
+        <p class="muted">Di tiap baris: ✂ bagi dua di posisi playhead (atau di tengah), ⤓ gabung dengan baris berikutnya, ＋ sisipkan baris sesudahnya.</p>
+        <details class="bulk" open>
+          <summary>✏ Edit teks semua subtitle</summary>
+          <div class="grid2">
+            <label>Cari <input id="capFind" type="text" placeholder="kata lama" /></label>
+            <label>Ganti dengan <input id="capRepl" type="text" placeholder="kata baru" /></label>
+          </div>
+          <div class="row gap">
+            <button id="btnCapReplace" class="small">Ganti semua</button>
+            <button id="btnCapCase" class="ghost small" title="Huruf kapital di awal tiap baris">Aa Kapital awal</button>
+            <button id="btnCapPunct" class="ghost small" title="Hapus titik & koma di akhir baris">Hapus tanda baca akhir</button>
+          </div>
+          <div class="row gap">
+            <label>Bagi ulang per <input id="capRegroupN" type="number" min="1" max="20" step="1" value="3" style="width:60px" /> kata</label>
+            <button id="btnCapRegroup" class="ghost small" title="Susun ulang semua baris, waktu tiap kata tetap">Bagi ulang</button>
+          </div>
+        </details>
+        <div class="col" style="margin-top:10px">
+          <button id="btnCapToScenes" class="ghost">🎬 Jadikan lapisan teks (tiap baris jadi teks)</button>
+          <button id="btnCapSrt" class="ghost">⬇ Unduh subtitle (.srt)</button>
+          <button id="btnCapTxt" class="ghost small" title="Unduh teks saja tanpa waktu">⬇ .txt</button>
+          <button id="btnCapCopy" class="ghost small" title="Salin subtitle (format SRT) ke clipboard">📋 Salin subtitle</button>
+        </div>
+      </div>
+
+      <!-- FILTER -->
+      <div class="tab-body" id="tab-filter">
+        <h3>Filter</h3>
+        <p class="muted">💡 Klik filter = pasang di klip terpilih. Tombol <b>＋</b> di pojok = tambah sebagai <b>lapisan di timeline</b>.</p>
+        <p class="muted" id="flGridHint">Klik filter untuk memasangnya di klip yang dipilih. Belum memilih klip? Dipasang di seluruh video.</p>
+        <div class="row gap grid-tools">
+          <label class="grow-lbl">Kekuatan <input id="flGridAmt" type="range" min="0" max="100" step="5" value="100" /> <output id="flGridAmtOut"></output></label>
+          <button id="btnFlGridAll" class="ghost small" title="Pasang filter klip terpilih ke semua klip">⧉ Ke semua klip</button>
+        </div>
+        <div id="flGrid" class="fx-grid"></div>
+
+        <h3>Filter &amp; efek seluruh video</h3>
+        <p class="muted">Berlaku untuk semua klip yang tidak punya filter/efek sendiri.</p>
+        <div class="grid2">
+          <label>Filter warna <select id="bgFilter"></select></label>
+          <label>Kekuatan filter <input id="bgFilterAmt" type="range" min="0" max="100" step="5" /> <output data-for="bgFilterAmt"></output></label>
+          <label>Efek animasi <select id="bgFx"></select></label>
+          <label>Kekuatan efek <input id="bgFxAmt" type="range" min="0" max="100" step="5" /> <output data-for="bgFxAmt"></output></label>
+        </div>
+      </div>
+
+      <!-- PENYESUAIAN -->
+      <div class="tab-body" id="tab-adjust">
+        <h3>Atur warna klip</h3>
+        <p class="muted">Kecerahan, kontras, saturasi, suhu, rona, dan vignette tiap klip diatur di panel <b>Properti → Penyesuaian</b> setelah klipnya diklik di timeline.</p>
+        <button id="btnAdjOpen" class="ghost small">🎚 Buka penyesuaian klip terpilih</button>
+
+        <h3>Seluruh video</h3>
+        <label>Gelapkan background <input id="overlay" type="range" min="0" max="0.9" step="0.05" /> <output data-for="overlay"></output></label>
+        <label>Blur background <input id="bgBlur" type="range" min="0" max="20" step="1" /> <output data-for="bgBlur"></output></label>
+
+        <h3>Latar kanvas</h3>
+        <p class="muted">Tampil di area kosong (mis. foto yang tidak memenuhi layar) dan saat belum ada klip.</p>
+        <div class="seg" id="bgType">
+          <button data-v="gradient">Gradasi</button>
+          <button data-v="aurora">Aurora</button>
+          <button data-v="waves">Gelombang</button>
+          <button data-v="color">Warna</button>
+          <button data-v="media">📷 Foto &amp; Video</button>
+        </div>
+        <div class="bg-opt" data-for="gradient">
+          <div id="gradPresets" class="swatches"></div>
+          <label class="check"><input id="gradAnimate" type="checkbox" /> Gradasi bergerak</label>
+        </div>
+        <div class="bg-opt" data-for="color">
+          <label>Warna <input id="bgColor" type="color" /></label>
+        </div>
+
+        <h3>Rasio video</h3>
+        <div class="seg" id="ratio">
+          <button data-v="9:16">9:16 Story/Reels</button>
+          <button data-v="4:5">4:5 Feed</button>
+          <button data-v="1:1">1:1</button>
+          <button data-v="16:9">16:9 YouTube</button>
+        </div>
+      </div>
+
+      <!-- TAB TEMPLATE -->
+      <div class="tab-body" id="tab-template">
+        <h3>Template video</h3>
+        <p class="muted">Pilih template, isi slot dengan media dari perpustakaan, lalu <b>Pakai template</b>: klip, transisi, filter, teks, dan efek langsung tersusun di timeline.</p>
+        <div id="vtplGrid" class="vtpl-grid"></div>
+        <div id="vtplSlots" class="vtpl-slots hidden">
+          <div class="row between"><b id="vtplTitle"></b><button id="vtplCancel" class="ghost small" title="Tutup">✕</button></div>
+          <p id="vtplHint" class="muted"></p>
+          <div id="vtplSlotList" class="vtpl-slot-list"></div>
+          <div class="row gap"><button id="vtplAuto" class="ghost small">↻ Isi otomatis</button><button id="vtplApply" class="primary">Pakai template</button></div>
+        </div>
+        <div class="row between">
+          <h3>Template gaya</h3>
+          <button id="btnRandom" class="ghost small">🎲 Acak</button>
+        </div>
+        <p class="muted">Klik template untuk menerapkan gaya teks, animasi, dan efek sekaligus. Klip di timeline tidak berubah.</p>
+        <div id="templateList" class="tpl-grid"></div>
+      </div>
+
+    </section>
+
+    <!-- TENGAH: PEMUTAR -->
+    <section class="stage">
+      <div class="area-head"><span>Pemutar</span><span id="ratioBadge" class="muted"></span></div>
+      <div class="canvas-wrap"><canvas id="canvas"></canvas>
+        <div id="welcome" class="welcome hidden">
+          <div class="wl-logo"><img src="icons/icon.svg" alt="" width="44" height="44" /></div>
+          <b>Mulai edit video</b>
+          <span>Impor foto / video, lalu klik <b>＋</b> atau seret ke timeline.</span>
+          <button id="btnWelcomeImport" class="primary">＋ Impor media</button>
+          <small>atau seret file ke sini • pilih <b>Template</b> untuk mulai cepat</small>
+        </div>
+      </div>
+      <div class="drop-hint">Lepaskan gambar, video, atau musik di sini</div>
+      <div class="player">
+        <span id="timeLabel" class="mono">0:00 / 0:00</span>
+        <span class="grow"></span>
+        <button id="btnPlay" class="primary round" title="Putar / jeda (Spasi)">▶</button>
+        <span class="grow"></span>
+        <span class="player-right">
+          <select id="previewQuality" class="player-ratio" title="Kualitas pratinjau (hasil export tetap penuh)"><option value="1">Penuh</option><option value="0.5">½</option><option value="0.25">¼</option></select>
+          <select id="playerRatio" class="player-ratio" title="Rasio video">
+            <option value="9:16">9:16</option><option value="4:5">4:5</option><option value="1:1">1:1</option><option value="16:9">16:9</option>
+          </select>
+          <button id="btnGuides" class="ghost tool" title="Panduan area aman TikTok/Reels (G)"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M4 8h16M4 16h16"/></svg></button>
+          <button id="btnFullscreen" class="ghost tool" title="Layar penuh (F)"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg></button>
+        </span>
+      </div>
+    </section>
+
+    <!-- KANAN: PROPERTI -->
+    <aside class="inspector">
+      <div class="area-head"><span>Properti</span><button id="inspClose" class="ghost small m-only" title="Tutup Properti">✕ Selesai</button></div>
+      <div class="insp-body">
+        <div class="insp-empty">
+          <svg viewBox="0 0 24 24" width="40" height="40" aria-hidden="true"><path d="M4 4l7 17 2.5-7.5L21 11z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+          <p>Klik klip video/foto, teks, atau track audio di timeline untuk mengatur propertinya di sini.</p>
+          <p class="muted">Tambah media dari panel <b>Media</b> dengan tombol ＋ atau seret ke timeline.</p>
+        </div>
+        <div id="sceneBar" class="clip-bar scene-bar hidden"></div>
+        <div id="segBar" class="clip-bar hidden"></div>
+        <div id="textBar" class="clip-bar hidden" data-pt="teks">
+          <span id="tbName" class="clip-name"></span>
+          <button id="tbCenter" class="tool ghost" title="Kembalikan posisi ke tengah"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg> Tengah</button>
+          <button id="tbUp" class="tool ghost" title="Bawa ke depan"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg> Depan</button>
+          <button id="tbDup" class="tool ghost" title="Duplikat"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 00-2-2H6a2 2 0 00-2 2v8a2 2 0 002 2h2"/></svg></button>
+          <button id="tbDel" class="tool ghost" title="Hapus (Delete)"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg></button>
+          <div class="ptabs" id="tbTabs" role="tablist">
+            <button data-ptab="teks" class="active">Teks</button>
+            <button data-ptab="gaya">Gaya</button>
+            <button data-ptab="animasi">Animasi</button>
+          </div>
+          <label id="tbTextWrap" data-pt="teks">Teks <textarea id="tbText" rows="3" placeholder="Tulis teks… *kata* = disorot"></textarea></label>
+          <label data-pt="teks" class="half">Muncul (dtk) <input id="tbStart" type="number" min="0" step="0.1" /></label>
+          <label data-pt="teks" class="half">Hilang (dtk) <input id="tbEnd" type="number" min="0" step="0.1" /></label>
+          <span class="clip-sep" data-pt="x"></span>
+          <label data-pt="teks" class="half">Posisi X <input id="tbX" type="range" min="-0.2" max="1.2" step="0.005" /><output id="tbXOut"></output></label>
+          <label data-pt="teks" class="half">Posisi Y <input id="tbY" type="range" min="-0.2" max="1.2" step="0.005" /><output id="tbYOut"></output></label>
+          <label data-pt="teks">Ukuran <input id="tbS" type="range" min="0.2" max="4" step="0.05" /><output id="tbSOut"></output></label>
+          <label data-pt="teks" class="half">Putar <input id="tbR" type="range" min="-180" max="180" step="1" /><output id="tbROut"></output></label>
+          <label data-pt="teks" class="half">Transparansi <input id="tbO" type="range" min="0" max="1" step="0.05" /><output id="tbOOut"></output></label>
+          <div class="kf-bar" data-pt="teks">
+            <span class="kf-title">Keyframe</span>
+            <button id="tbKfPrev" class="tool ghost mini" title="Ke keyframe sebelumnya">‹</button>
+            <button id="tbKfAdd" class="tool kf-diamond" title="Tambah / hapus keyframe di posisi playhead">◆</button>
+            <button id="tbKfNext" class="tool ghost mini" title="Ke keyframe berikutnya">›</button>
+            <span id="tbKfInfo" class="muted"></span>
+            <button id="tbKfClear" class="tool ghost mini" title="Hapus semua keyframe lapisan ini">Hapus semua</button>
+          </div>
+          <p id="tbKeyNote" data-pt="teks" class="muted tb-note hidden">◆ Lapisan ini memakai keyframe: perubahan di sini disimpan sebagai keyframe di posisi playhead.</p>
+          <span class="clip-sep" data-pt="x"></span>
+          <button id="tbStyle" class="tool ghost hidden" title="Font, warna, animasi teks">🎨 Gaya &amp; animasi teks</button>
+          <button data-pt="teks" id="tbRmbg" class="tool hidden" title="Hapus latar gambar otomatis dengan AI">✂ Hapus latar (AI)</button>
+          <button data-pt="teks" id="tbRmbgUndo" class="tool ghost hidden">↺ Kembalikan latar</button>
+          <button id="tbCard" data-pt="teks" class="tool ghost" title="Buka kartu lengkap lapisan ini">☰ Pengaturan lengkap</button>
+          <div id="tbGaya" data-pt="gaya" class="tb-pane"></div>
+          <div id="tbAnim" data-pt="animasi" class="tb-pane"></div>
+          <div id="tbOv" data-pt="ov" class="tb-pane"></div>
+        </div>
+        <div id="mvBar" class="clip-bar hidden">
+          <span id="mvName" class="clip-name"></span>
+          <button id="mvReplace" class="tool ghost" title="Ganti file">Ganti file…</button>
+          <button id="mvRemove" class="tool ghost" title="Hapus"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg></button>
+          <label>Volume <input id="mvVol" type="range" min="0" max="2" step="0.05" /><output id="mvVolOut"></output></label>
+          <label class="half"><span id="mvStartLbl">Mulai</span> <input id="mvStart" type="number" min="0" step="0.1" /></label>
+          <label class="check" id="mvExtraWrap"><input id="mvExtra" type="checkbox" /> <span id="mvExtraLbl"></span></label>
+          <span class="clip-sep"></span>
+          <button id="mvMore" class="tool ghost" title="Pengaturan lengkap di kategori Audio">☰ Pengaturan lengkap</button>
+        </div>
+        <div id="clipBar" class="clip-bar hidden" data-pt="dasar">
+        <span id="clipName" class="clip-name"></span>
+        <button id="btnSplit" class="tool" title="Potong klip di posisi playhead (S)"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><path d="M8 7.5L20 18M8 16.5L20 6"/></svg> Potong</button>
+        <button data-pt="kecepatan" id="btnClipRev" class="tool ghost" title="Putar klip video ini mundur (reverse)"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 17l-6-5 6-5v10zM19 17l-6-5 6-5v10z"/></svg> Mundur</button>
+        <button data-pt="kecepatan" id="btnClipFreeze" class="tool ghost" title="Bekukan frame di posisi playhead (freeze frame)"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9M9 4.5l3 2 3-2M9 19.5l3-2 3 2"/></svg> Beku</button>
+        <button id="btnClipDup" class="tool ghost" title="Duplikat klip"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 00-2-2H6a2 2 0 00-2 2v8a2 2 0 002 2h2"/></svg></button>
+        <button id="btnClipDel" class="tool ghost" title="Hapus klip dari urutan"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg></button>
+        <div class="ptabs" role="tablist">
+          <button data-ptab="dasar" class="active">Dasar</button>
+          <button data-ptab="animasi">Animasi</button>
+          <button data-ptab="penyesuaian">Penyesuaian</button>
+          <button data-ptab="kecepatan">Kecepatan</button>
+          <button data-ptab="audio">Audio</button>
+        </div>
+        <label data-pt="kecepatan" id="clipSpeedWrap" class="half">Kecepatan
+          <select id="clipSpeed">
+            <option value="0.25">0.25x</option><option value="0.5">0.5x</option><option value="0.75">0.75x</option>
+            <option value="1">1x</option><option value="1.25">1.25x</option><option value="1.5">1.5x</option>
+            <option value="2">2x</option><option value="3">3x</option><option value="4">4x</option>
+          </select>
+        </label>
+        <div id="curveBox" data-pt="kecepatan" class="curve-box"></div>
+        <p data-pt="audio" id="clipAudNote" class="muted tb-note hidden">Foto tidak punya suara.</p>
+        <label data-pt="audio" class="clip-aud">Volume klip <input id="clipVol" type="range" min="0" max="2" step="0.05" /> <output id="clipVolOut"></output></label>
+        <label data-pt="audio" class="check clip-aud"><input id="clipMute" type="checkbox" /> 🔇 Bisukan klip ini</label>
+        <label data-pt="audio" class="half clip-aud">Fade in (dtk) <input id="clipFadeIn" type="number" min="0" max="10" step="0.1" /></label>
+        <label data-pt="audio" class="half clip-aud">Fade out (dtk) <input id="clipFadeOut" type="number" min="0" max="10" step="0.1" /></label>
+        <button data-pt="audio" id="btnClipDetach" class="tool clip-aud" title="Jadikan suara video ini track audio terpisah (klip dibisukan)">🎵 Pisahkan audio</button>
+        <p data-pt="audio" class="muted tb-note clip-aud">Volume di atas 100% berlaku di hasil export (pratinjau maksimal 100%). "Pisahkan audio" membuat track audio sendiri yang bisa dipotong & digeser bebas.</p>
+        <label data-pt="dasar" class="half">Durasi (dtk) <input id="clipDur" type="number" min="0.3" step="0.1" /></label>
+        <label data-pt="dasar" id="clipInWrap" class="half" title="Detik di dalam video tempat klip mulai (trim awal)">Mulai dari <input id="clipIn" type="number" min="0" step="0.1" /></label>
+        <div data-pt="dasar" class="clip-sec">Hapus latar</div>
+        <button data-pt="dasar" id="btnClipRmbg" class="tool" title="Hapus latar foto otomatis dengan AI (paling bagus untuk foto orang)">✂ Hapus latar (AI)</button>
+        <button data-pt="dasar" id="btnClipRmbgUndo" class="tool ghost hidden" title="Pakai lagi foto aslinya">↺ Kembalikan latar</button>
+        <div data-pt="animasi" class="clip-sec">Animasi klip</div>
+        <label data-pt="animasi" class="half">Masuk <select id="clipAnimIn"></select></label>
+        <label data-pt="animasi" class="half">Lama (dtk) <input id="clipAnimInDur" type="number" min="0.1" max="5" step="0.1" /></label>
+        <label data-pt="animasi" class="half">Keluar <select id="clipAnimOut"></select></label>
+        <label data-pt="animasi" class="half">Lama (dtk) <input id="clipAnimOutDur" type="number" min="0.1" max="5" step="0.1" /></label>
+        <label data-pt="animasi" class="half">Kombo (berulang) <select id="clipAnimCombo"></select></label>
+        <label data-pt="animasi" class="half">Periode (dtk) <input id="clipAnimComboDur" type="number" min="0.3" max="10" step="0.1" /></label>
+        <div data-pt="animasi" class="clip-sec">Transisi</div>
+        <label data-pt="animasi" class="half">Transisi masuk <select id="clipTrans"></select></label>
+        <label data-pt="animasi" class="half">Lama transisi (dtk) <input id="clipTransDur" type="number" min="0.1" max="5" step="0.1" title="Lama transisi (detik)" /></label>
+        <span class="clip-sep" data-pt="x"></span>
+        <div data-pt="animasi" class="clip-sec">Filter &amp; efek</div>
+        <label data-pt="animasi" class="half">Filter <select id="clipFilter" title="Filter warna klip ini"></select></label>
+        <label data-pt="animasi" class="half">Kekuatan filter <input id="clipFilterAmt" type="range" min="0" max="100" step="5" title="Kekuatan filter" /></label>
+        <label data-pt="animasi" class="half">Efek <select id="clipFx" title="Efek animasi klip ini"></select></label>
+        <label data-pt="animasi" class="half">Kekuatan efek <input id="clipFxAmt" type="range" min="0" max="100" step="5" title="Kekuatan efek" /></label>
+        <button data-pt="animasi" id="btnClipTransAll" class="tool ghost" title="Pakai transisi ini di semua klip">Transisi ke semua klip</button>
+        <span class="clip-sep" data-pt="x"></span>
+        <div data-pt="penyesuaian" class="clip-sec">Atur warna <button id="btnAdjReset" class="tool ghost mini" title="Kembalikan warna asli">Reset</button></div>
+        <label data-pt="penyesuaian" class="half">Kecerahan <input id="adjBright" data-adj="bright" type="range" min="-100" max="100" step="1" /> <output></output></label>
+        <label data-pt="penyesuaian" class="half">Kontras <input id="adjContrast" data-adj="contrast" type="range" min="-100" max="100" step="1" /> <output></output></label>
+        <label data-pt="penyesuaian" class="half">Saturasi <input id="adjSat" data-adj="sat" type="range" min="-100" max="100" step="1" /> <output></output></label>
+        <label data-pt="penyesuaian" class="half">Suhu (dingin ↔ hangat) <input id="adjTemp" data-adj="temp" type="range" min="-100" max="100" step="1" /> <output></output></label>
+        <label data-pt="penyesuaian" class="half">Rona hijau ↔ ungu <input id="adjTint" data-adj="tint" type="range" min="-100" max="100" step="1" /> <output></output></label>
+        <label data-pt="penyesuaian" class="half">Vignette <input id="adjVig" data-adj="vig" type="range" min="0" max="100" step="1" /> <output></output></label>
+        <label data-pt="penyesuaian" class="half" title="Haluskan kulit / gambar (retouch)">Haluskan (retouch) <input id="adjSmooth" data-adj="smooth" type="range" min="0" max="100" step="1" /> <output></output></label>
+        <button data-pt="penyesuaian" id="btnAdjAll" class="tool ghost" title="Pakai pengaturan warna ini di semua klip">Warna ke semua klip</button>
+        <span class="clip-sep" data-pt="x"></span>
+        <div data-pt="dasar" class="clip-sec">Mask</div>
+        <label data-pt="dasar" class="half">Bentuk <select id="clipMask"></select></label>
+        <label data-pt="dasar" class="check half mask-opt"><input id="clipMaskInvert" type="checkbox" /> Balik (invert)</label>
+        <label data-pt="dasar" class="half mask-opt">Ukuran <input id="clipMaskSize" type="range" min="0.1" max="2" step="0.02" /></label>
+        <label data-pt="dasar" class="half mask-opt">Halus tepi <input id="clipMaskFeather" type="range" min="0" max="1" step="0.05" /></label>
+        <label data-pt="dasar" class="half mask-opt">Geser ↔ <input id="clipMaskX" type="range" min="-0.5" max="0.5" step="0.01" /></label>
+        <label data-pt="dasar" class="half mask-opt">Geser ↕ <input id="clipMaskY" type="range" min="-0.5" max="0.5" step="0.01" /></label>
+        <div data-pt="dasar" class="clip-sec">Latar kanvas</div>
+        <label data-pt="dasar" class="half">Isi area kosong <select id="clipCanvas"><option value="">Hitam / ikut latar</option><option value="blur">Blur klip</option><option value="color">Warna</option></select></label>
+        <label data-pt="dasar" class="half canvas-opt canvas-color">Warna <input id="clipCanvasColor" type="color" /></label>
+        <label data-pt="dasar" class="half canvas-opt canvas-blur">Tingkat blur <input id="clipCanvasBlur" type="range" min="1" max="4" step="1" /></label>
+        <button data-pt="dasar" id="btnCanvasAll" class="tool ghost canvas-opt" title="Pakai latar kanvas ini di semua klip">Latar ke semua klip</button>
+        <div data-pt="dasar" class="clip-sec">Crop, putar &amp; balik <button id="btnCropReset" class="tool ghost mini" title="Kembalikan bingkai asli">Reset</button></div>
+        <button data-pt="dasar" id="btnClipRot" class="tool ghost" title="Putar klip 90° searah jarum jam"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 10-2.3 5.7"/><path d="M20 4v7h-7"/></svg> Putar 90°</button>
+        <button data-pt="dasar" id="btnClipFlipH" class="tool ghost" title="Balik kiri-kanan (cermin)"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M9 7L3 17h6zM15 7l6 10h-6z"/></svg> Balik ↔</button>
+        <button data-pt="dasar" id="btnClipFlipV" class="tool ghost" title="Balik atas-bawah"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h18M7 9L17 3v6zM7 15l10 6v-6z"/></svg> Balik ↕</button>
+        <label data-pt="dasar" class="half">Crop kiri <input id="cropL" data-crop="l" type="range" min="0" max="45" step="1" /> <output></output></label>
+        <label data-pt="dasar" class="half">Crop kanan <input id="cropR" data-crop="r" type="range" min="0" max="45" step="1" /> <output></output></label>
+        <label data-pt="dasar" class="half">Crop atas <input id="cropT" data-crop="t" type="range" min="0" max="45" step="1" /> <output></output></label>
+        <label data-pt="dasar" class="half">Crop bawah <input id="cropB" data-crop="b" type="range" min="0" max="45" step="1" /> <output></output></label>
+        <span class="clip-sep" data-pt="x"></span>
+        <div data-pt="dasar" class="clip-sec">Transform (keyframe) <span id="kfInfo" class="muted"></span></div>
+        <label data-pt="dasar">Skala <input id="kfZoom" data-kf="z" type="range" min="10" max="300" step="1" /> <output></output></label>
+        <label data-pt="dasar" class="half">Geser kiri ↔ kanan <input id="kfX" data-kf="x" type="range" min="-50" max="50" step="1" /> <output></output></label>
+        <label data-pt="dasar" class="half">Geser atas ↕ bawah <input id="kfY" data-kf="y" type="range" min="-50" max="50" step="1" /> <output></output></label>
+        <label data-pt="dasar" class="half">Putar <input id="kfR" data-kf="r" type="range" min="-180" max="180" step="1" /> <output></output></label>
+        <label data-pt="dasar" class="half">Opasitas <input id="kfO" data-kf="o" type="range" min="0" max="100" step="1" /> <output></output></label>
+        <button data-pt="dasar" id="btnKfAdd" class="tool ghost" title="Simpan zoom & geser sekarang sebagai keyframe di posisi playhead">◆ Keyframe di playhead</button>
+        <button data-pt="dasar" id="btnKfDel" class="tool ghost" title="Hapus keyframe di posisi playhead">◇ Hapus keyframe</button>
+        <button data-pt="dasar" id="btnKenBurns" class="tool ghost" title="Zoom & geser pelan otomatis dari awal ke akhir klip">🎥 Ken Burns otomatis</button>
+        <button data-pt="dasar" id="btnKfClear" class="tool ghost" title="Hapus semua keyframe klip ini">Hapus semua</button>
+        <p data-pt="dasar" class="muted tb-note">Tanpa keyframe, zoom &amp; geser berlaku untuk seluruh klip. Setelah ada keyframe, slider menyimpan nilai sebagai keyframe di posisi playhead dan gerakan dihaluskan di antaranya.</p>
+      </div>
+        <div id="audioBar" class="clip-bar hidden" data-pt="dasar">
+        <span id="audName" class="clip-name"></span>
+        <button id="btnAudSplit" class="tool" title="Potong track di posisi playhead (S)"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><path d="M8 7.5L20 18M8 16.5L20 6"/></svg> Potong</button>
+        <button id="btnAudDup" class="tool ghost" title="Duplikat (ditaruh sesudahnya)"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 00-2-2H6a2 2 0 00-2 2v8a2 2 0 002 2h2"/></svg></button>
+        <button id="btnAudDel" class="tool ghost" title="Hapus track (Delete)"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg></button>
+        <div class="ptabs" id="audTabs" role="tablist">
+          <button data-ptab="dasar" class="active">Dasar</button>
+          <button data-ptab="suara">Suara</button>
+        </div>
+        <label data-pt="dasar" class="half">Mulai (dtk) <input id="audStart" type="number" min="0" step="0.1" /></label>
+        <label data-pt="dasar" class="half">Durasi (dtk) <input id="audLen" type="number" min="0.1" step="0.1" /></label>
+        <label data-pt="dasar">Volume <input id="audVol" type="range" min="0" max="2" step="0.05" /> <output id="audVolOut"></output></label>
+        <label data-pt="dasar" class="half">Fade in <input id="audFadeIn" type="number" min="0" max="10" step="0.1" /></label>
+        <label data-pt="dasar" class="half">Fade out <input id="audFadeOut" type="number" min="0" max="10" step="0.1" /></label>
+        <label data-pt="suara">Efek suara <select id="audFx"></select></label>
+        <label data-pt="suara" title="Ubah nada suara tanpa mengubah kecepatan">🎭 Pengubah suara (nada) <select id="audPitch"></select></label>
+        <label data-pt="suara" title="Kurangi desis, dengung, dan suara latar konstan">✨ Kekuatan hapus bising <input id="audDenoise" type="range" min="0" max="100" step="5" value="60" /> <output id="audDenoiseOut">60</output></label>
+        <label data-pt="suara" class="check"><input id="audNorm" type="checkbox" checked /> Ratakan volume</label>
+        <button data-pt="suara" id="btnAudClean" class="tool">✨ Hapus bising</button>
+        <button data-pt="suara" id="btnAudOrig" class="tool ghost hidden">↺ Suara asli</button>
+        <button id="btnAudClose" class="tool ghost hidden" title="Tutup">✕</button>
+      </div>
+      </div>
+    </aside>
+
+    <!-- BAWAH: TIMELINE -->
+    <section class="tl-area">
+      <div id="tlResizer" class="tl-resizer" title="Tarik untuk mengubah tinggi timeline"></div>
+      <div class="tl-toolbar">
+        <button id="btnUndo" class="ghost icon-btn" title="Undo (Ctrl+Z)" disabled><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 010 12h-3"/></svg></button>
+        <button id="btnRedo" class="ghost icon-btn" title="Redo (Ctrl+Y)" disabled><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 14l5-5-5-5"/><path d="M20 9H10a6 6 0 000 12h3"/></svg></button>
+        <span class="tb-sep"></span>
+        <button id="tlSplit" class="ghost icon-btn" title="Potong klip / audio terpilih di playhead (S)"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><path d="M8 7.5L20 18M8 16.5L20 6"/></svg></button>
+        <button id="tlDup" class="ghost icon-btn" title="Duplikat klip / audio terpilih"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 00-2-2H6a2 2 0 00-2 2v8a2 2 0 002 2h2"/></svg></button>
+        <button id="tlDelLeft" class="ghost icon-btn" title="Hapus bagian kiri playhead (Q)"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v16"/><path d="M4 8l4 4-4 4" opacity=".45"/><path d="M15 9l3 3-3 3"/></svg></button>
+        <button id="tlDelRight" class="ghost icon-btn" title="Hapus bagian kanan playhead (W)"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v16"/><path d="M20 8l-4 4 4 4" opacity=".45"/><path d="M9 9l-3 3 3 3"/></svg></button>
+        <button id="tlDel" class="ghost icon-btn" title="Hapus klip / audio terpilih"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg></button>
+        <span class="tb-sep m-only"></span>
+        <button id="tlPick" class="ghost icon-btn m-only" title="Pilih banyak (ketuk beberapa klip/teks)"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1.5"/><path d="M5 7l1.5 1.5L9 5.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/><path d="M15 17l1.5 1.5L19 15.5"/><path d="M13 7h8M3 17h8"/></svg></button>
+        <button id="tlCopy" class="ghost icon-btn m-only" title="Salin yang dipilih"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 012-2h8"/></svg></button>
+        <button id="tlPaste" class="ghost icon-btn m-only" title="Tempel di playhead"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1M9 10h6M9 14h6M9 18h3"/></svg></button>
+        <span class="tb-sep"></span>
+        <button id="tlGroup" class="ghost icon-btn" title="Kelompokkan lapisan terpilih (Ctrl+G)"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 005.6 0l3-3a4 4 0 00-5.6-5.6l-1 1"/><path d="M14 10a4 4 0 00-5.6 0l-3 3a4 4 0 005.6 5.6l1-1"/></svg></button>
+        <button id="tlUngroup" class="ghost icon-btn" title="Bubarkan grup (Ctrl+Shift+G)"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 005.6 0l1.5-1.5M18.5 10.5L19 10a4 4 0 00-5.6-5.6l-1 1"/><path d="M14 10a4 4 0 00-5.6 0l-.5.5M5.5 13.5L5 14a4 4 0 005.6 5.6l1-1"/><path d="M3 3l18 18"/></svg></button>
+        <span class="tb-sep"></span>
+        <button id="tlFreeze" class="ghost icon-btn" title="Bekukan frame (freeze)"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9"/></svg></button>
+        <button id="tlReverse" class="ghost icon-btn" title="Putar mundur (reverse)"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 17l-6-5 6-5v10zM19 17l-6-5 6-5v10z"/></svg></button>
+        <button id="tlMirror" class="ghost icon-btn" title="Cermin (balik kiri-kanan)"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M9 7L3 17h6zM15 7l6 10h-6z"/></svg></button>
+        <button id="tlRotate" class="ghost icon-btn" title="Putar 90°"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 10-2.3 5.7"/><path d="M20 4v7h-7"/></svg></button>
+        <button id="tlCrop" class="ghost icon-btn" title="Crop"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2v16h16"/><path d="M2 6h16v16"/></svg></button>
+        <span class="grow"></span>
+        <button id="tlMarker" class="ghost icon-btn" title="Tambah / hapus penanda di playhead (M)"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 21V4h11l-2 4 2 4H6"/></svg></button>
+        <button id="tlSnap" class="ghost icon-btn active" title="Magnet: tempel ke tepi klip, teks, audio & playhead saat menggeser"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3v8a6 6 0 0012 0V3"/><path d="M6 3h4v8a2 2 0 004 0V3h4" /><path d="M6 7h4M14 7h4"/></svg></button>
+        <span id="tlMultiInfo" class="tl-multi hidden"></span>
+        <span class="muted tl-tip">Ctrl+B potong • Q/W hapus kiri/kanan • Ctrl+scroll zoom</span>
+        <span class="tb-sep"></span>
+        <button id="tlZoomOut" class="ghost icon-btn" title="Perkecil timeline"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg></button>
+        <input id="tlZoom" class="tl-zoom" type="range" min="0" max="100" step="1" value="0" title="Zoom timeline" />
+        <button id="tlZoomIn" class="ghost icon-btn" title="Perbesar timeline"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+        <button id="tlFit" class="ghost icon-btn" title="Paskan seluruh video"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+      </div>
+      <div id="timeline" class="timeline" title="Klik untuk lompat • tarik tepi kanan blok untuk mengubah durasi • klik ganda untuk edit teks">
+        <div class="tl-wrap">
+          <div id="tlHeads" class="tl-heads"></div>
+          <div id="tlInner" class="tl-inner">
+            <div id="tlRuler" class="tl-ruler"></div>
+            <div id="tlTrack" class="tl-track"></div>
+            <div id="tlBeats" class="tl-beats"></div>
+            <div id="tlMarkers" class="tl-markers"></div>
+            <div id="tlPlayhead" class="tl-playhead"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Dialog pengaturan export -->
+  <div id="exportPanel" class="modal hidden" data-dismiss role="dialog" aria-modal="true" aria-labelledby="epTitle">
+    <div class="modal-card wide export-card">
+      <div class="row between"><h2 id="epTitle">Export</h2><button class="ghost small" data-close>✕</button></div>
+      
+      <div id="tab-export" class="export-body">
+        
+        <div class="exp-grid">
+          <div class="exp-cover">
+            <img id="expThumb" alt="Sampul video" />
+            <span id="expDims" class="exp-dims"></span>
+          </div>
+          <div class="exp-fields">
+            <label>Nama file <input id="expName" type="text" maxlength="80" placeholder="nama video" /></label>
+            <div class="exp-sec">Video</div>
+            <div class="grid2">
+              <label>Resolusi
+                <select id="res">
+                  <option value="0.4444">480p</option>
+                  <option value="0.6667">720p</option>
+                  <option value="1">1080p (disarankan)</option>
+                  <option value="1.3333">2K (1440p)</option>
+                  <option value="2">4K (2160p)</option>
+                </select>
+              </label>
+              <label>Frame rate
+                <select id="fps"><option value="24">24 fps</option><option value="25">25 fps</option><option value="30">30 fps</option><option value="50">50 fps</option><option value="60">60 fps</option></select>
+              </label>
+              <label>Bitrate (kualitas)
+                <select id="quality"><option value="medium">Rendah (file kecil)</option><option value="high">Disarankan</option><option value="max">Tinggi</option><option value="ultra">Sangat tinggi</option></select>
+              </label>
+              <label>Format <select id="expFormat" disabled><option>MP4 (H.264 + AAC)</option></select></label>
+            </div>
+            <p id="expEstimate" class="exp-est"></p>
+          </div>
+        </div>
+        <details class="exp-adv">
+          <summary>Lanjutan</summary>
+          <label>Mesin export
+            <select id="exportMode">
+              <option value="auto">Presisi (WebCodecs, MP4) — disarankan</option>
+              <option value="realtime">Realtime (MediaRecorder)</option>
+            </select>
+          </label>
+          <p class="muted" id="formatInfo"></p>
+        </details>
+        <button id="btnExport" class="primary big">⬇ Export <kbd>Ctrl+E</kbd></button>
+        <button id="btnExportScenes" class="ghost wide hidden">🎞 Export tiap scene jadi video terpisah</button>
+        <p id="exportStatus" class="muted"></p>
+
+        <div id="sharePanel" class="share-panel">
+          <h3>📤 Posting ke media sosial</h3>
+          <p id="shareFile" class="muted"></p>
+          <div class="row gap">
+            <button id="btnShare" class="primary">📤 Bagikan</button>
+            <label class="file-btn ghost small" title="Bagikan video hasil export sebelumnya">Pilih file video lain<input id="fileShare" type="file" accept="video/*" hidden /></label>
+          </div>
+          <p id="shareHint" class="muted"></p>
+          <label>Caption &amp; hashtag
+            <textarea id="shareCaption" rows="6" placeholder="Kosongkan untuk caption otomatis dari teks di video"></textarea>
+          </label>
+          <div class="row gap">
+            <button id="btnCaptionAuto" class="ghost small">✨ Buat caption otomatis</button>
+            <button id="btnCaptionCopy" class="ghost small">📋 Salin caption</button>
+          </div>
+          <p class="muted">Posting ke (caption + hashtag khas platform disalin, halaman upload dibuka):</p>
+          <div id="shareTargets" class="share-targets"></div>
+        </div>
+        <h3>Gambar</h3>
+        <div class="col">
+          <button id="btnSnapshot" class="ghost">📷 Simpan frame ini sebagai PNG</button>
+          <button id="btnExportPng" class="ghost hidden">🖼 Simpan semua scene jadi PNG (carousel)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dialog export -->
+  <div id="exportModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="emTitle">
+    <div class="modal-card">
+      <h2 id="emTitle">Mengekspor video…</h2>
+      <p id="emMode" class="muted"></p>
+      <div class="progress big"><div id="emBar"></div></div>
+      <div class="row between em-row"><span id="emInfo" class="muted"></span><b id="emPct">0%</b></div>
+      <div class="row end gap"><span id="emShare" class="hidden"><button id="emShareBtn" class="primary">📤 Bagikan / posting</button></span><button id="emCancel">Batal</button></div>
+    </div>
+  </div>
+
+  <!-- Dialog pintasan keyboard -->
+  <div id="helpModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+    <div class="modal-card">
+      <div class="row between"><h2 id="helpTitle">Pintasan keyboard</h2><button class="ghost small" data-close>✕</button></div>
+      <table class="keys">
+        <tr><td><kbd>Spasi</kbd></td><td>Putar / jeda</td></tr>
+        <tr><td><kbd>←</kbd> <kbd>→</kbd></td><td>Mundur / maju 1 frame</td></tr>
+        <tr><td><kbd>Shift</kbd> + <kbd>←</kbd> <kbd>→</kbd></td><td>Mundur / maju 1 detik</td></tr>
+        <tr><td><kbd>Home</kbd> / <kbd>End</kbd></td><td>Ke awal / akhir video</td></tr>
+        <tr><td><kbd>Ctrl</kbd> + <kbd>Z</kbd> / <kbd>Y</kbd></td><td>Undo / redo</td></tr>
+        <tr><td><kbd>Ctrl</kbd> + <kbd>S</kbd></td><td>Simpan project ke file</td></tr>
+        <tr><td><kbd>Ctrl</kbd> + <kbd>E</kbd></td><td>Export video</td></tr>
+        <tr><td><kbd>F</kbd></td><td>Layar penuh</td></tr>
+        <tr><td><kbd>G</kbd></td><td>Panduan area aman</td></tr>
+        <tr><td><kbd>Ctrl</kbd> + <kbd>B</kbd> / <kbd>S</kbd></td><td>Potong klip di posisi playhead</td></tr>
+        <tr><td><kbd>Q</kbd> / <kbd>W</kbd></td><td>Hapus bagian klip di kiri / kanan playhead</td></tr>
+        <tr><td><kbd>Delete</kbd></td><td>Hapus klip / teks / audio terpilih</td></tr>
+        <tr><td><kbd>M</kbd></td><td>Tambah / hapus penanda di playhead</td></tr>
+        <tr><td><kbd>Ctrl</kbd> + klik</td><td>Pilih banyak klip / teks / lapisan</td></tr>
+        <tr><td><kbd>Ctrl</kbd> + <kbd>G</kbd> / <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>G</kbd></td><td>Kelompokkan / bubarkan grup lapisan</td></tr>
+        <tr><td><kbd>Ctrl</kbd> + <kbd>C</kbd> / <kbd>X</kbd> / <kbd>V</kbd></td><td>Salin / potong / tempel (teks & lapisan di playhead, klip sesudah klip terpilih)</td></tr>
+        <tr><td><kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>C</kbd> / <kbd>V</kbd></td><td>Salin / tempel atribut (filter, warna, transisi • gaya & animasi teks)</td></tr>
+        <tr><td><kbd>Shift</kbd> + <kbd>M</kbd></td><td>Lompat ke penanda berikutnya</td></tr>
+        <tr><td><kbd>?</kbd> / <kbd>Esc</kbd></td><td>Buka / tutup bantuan ini</td></tr>
+      </table>
+      <p class="muted">Timeline: klik untuk lompat, seret klip untuk mengubah urutan, tarik tepi untuk trim, seret media dari panel Media ke timeline.</p>
+    </div>
+  </div>
+
+  <!-- Dialog Project Saya -->
+  <div id="galleryModal" class="modal hidden" data-dismiss role="dialog" aria-modal="true" aria-labelledby="galleryTitle">
+    <div class="modal-card wide">
+      <div class="row between">
+        <h2 id="galleryTitle">📁 Project Saya <span id="galleryCount" class="muted"></span></h2>
+        <button class="ghost small" data-close>✕</button>
+      </div>
+      <p class="muted">Semua project tersimpan otomatis di browser ini. Gambar, video, musik, dan suara perlu dipilih ulang setelah membuka project.</p>
+      <div id="galleryList" class="g-list"></div>
+      <div class="row end"><button id="btnGalleryNew" class="primary">+ Project baru</button></div>
+    </div>
+  </div>
+
+  <!-- Dialog Bank kata-kata -->
+  <div id="bankModal" class="modal hidden" data-dismiss role="dialog" aria-modal="true" aria-labelledby="bankTitle">
+    <div class="modal-card wide">
+      <div class="row between">
+        <h2 id="bankTitle">📚 Bank teks</h2>
+        <button class="ghost small" data-close>✕</button>
+      </div>
+      <input id="bankSearch" type="text" placeholder="Cari kata-kata…" />
+      <div id="bankCats" class="chips"></div>
+      <div id="bankList" class="bank-list"></div>
+      <div class="row between">
+        <span class="muted">Kata bertanda sorotan otomatis diberi warna.</span>
+        <button id="bankRandom" class="primary">🎲 Tambah 5 acak</button>
+      </div>
+    </div>
+  </div>
+
+    <!-- Fitur lama (disembunyikan, tetap ada agar project lama tetap terbaca) -->
+    <div id="legacyUi" hidden>
+          <label>Susunan
+            <select id="layout">
+              <option value="free">Teks bebas</option>
+              <option value="scenes">Scene berurutan</option>
+            </select>
+          </label>
+        <div class="row gap scene-style-tools">
+          <button id="btnSceneRandAll" class="ghost small" title="Beri tiap scene animasi teks & transisi acak yang berbeda">🎲 Acak transisi semua scene</button>
+          <button id="btnSceneResetAll" class="ghost small" title="Hapus pengaturan khusus semua scene">↺ Semua ikut global</button>
+        </div>
+        <button id="btnSample" class="ghost">Contoh</button>
+        <button id="btnAutoDur" class="ghost">Durasi otomatis</button>
+        <button id="btnBank" class="ghost">Bank</button>
+        <details class="bulk">
+          <summary>Tempel banyak kata-kata sekaligus</summary>
+          <p class="muted">Pisahkan setiap scene dengan satu baris kosong. Baris yang diawali “-” dianggap nama penulis.</p>
+          <textarea id="bulkText" rows="6" placeholder="Kata-kata pertama&#10;- Penulis&#10;&#10;Kata-kata kedua"></textarea>
+          <div class="row gap">
+            <label>Durasi/scene <input id="bulkDur" type="number" min="1" max="60" step="0.5" value="5" /> dtk</label>
+            <label class="check"><input id="bulkAuto" type="checkbox" checked /> Otomatis</label>
+            <button id="btnBulk">Buat scene</button>
+            <label class="file-btn ghost">📄 Impor .txt<input id="fileTxt" type="file" accept=".txt,text/plain" hidden /></label>
+          </div>
+        </details>
+          <label class="file-btn primary-file">＋ Upload foto / video (bisa banyak sekaligus)<input id="fileMedia" type="file" accept="image/*,video/*" multiple hidden /></label>
+          <label>Cara memakai
+            <select id="mediaMode">
+              <option value="single">Satu media untuk semua scene</option>
+              <option value="slideshow">Bergantian per scene (slideshow)</option>
+              <option value="timed">Urutan klip (durasi masing-masing)</option>
+            </select>
+          </label>
+        <h3>Judul tetap</h3>
+        <input id="headerText" type="text" maxlength="60" placeholder="mis. Kata-kata hari ini ✨ (opsional)" />
+        <div class="grid2">
+          <label>Gaya
+            <select id="headerStyle">
+              <option value="plain">Teks biasa</option>
+              <option value="pill">Label (kapsul)</option>
+              <option value="line">Dengan garis</option>
+            </select>
+          </label>
+          <label>Warna <input id="headerColor" type="color" /></label>
+          <label>Ukuran <input id="headerSize" type="range" min="24" max="90" step="2" /></label>
+          <label>Posisi <input id="headerY" type="range" min="0.05" max="0.95" step="0.01" /></label>
+        </div>
+        <label class="check"><input id="quoteMark" type="checkbox" /> Tanda kutip besar “</label>
+    </div>
+
+  <div id="toasts" class="toasts" aria-live="polite"></div>
+
+  <audio id="music" loop hidden></audio>
+  <audio id="voice" hidden></audio>
+
+  <script src="js/vendor/mp4-muxer.min.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
